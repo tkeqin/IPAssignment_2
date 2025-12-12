@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Person Details</title>
+</head>
+<body>
+    <h1>Person Details</h1>
+    
+    <div th:if="${error}">
+        <p th:text="${error}"></p>
+    </div>
+
+    <div th:if="${person}">
+        <p><strong>Name:</strong> <span th:text="${person.name}"></span></p>
+        <p><strong>Year of Birth:</strong> <span th:text="${person.yearOfBirth}"></span></p>
+        <p><strong>Weight:</strong> <span th:text="${person.weight}"></span></p>
+        <p><strong>Height:</strong> <span th:text="${person.height}"></span></p>
+    </div>
+
+    <a th:href="@{/person/list}">Back to List</a>
+</body>
+</html>

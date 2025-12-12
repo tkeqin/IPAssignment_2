@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HealthHub@UTM - Member Registration</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; }
+        input, select { width: 100%; padding: 8px; margin: 10px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Member Registration - HealthHub@UTM</h2>
+    
+    <form th:action="@{/auth/register/save}" th:object="${member}" method="post">
+
+        <label>Username:</label>
+        <input type="text" th:field="*{username}"/>
+        
+        <label>Password:</label>
+        <input type="password" th:field="*{password}"/>
+        
+        <label>Name:</label>
+        <input type="text" th:field="*{name}"/>
+        
+        <label>Email:</label>
+        <input type="email" th:field="*{email}"/>
+        
+        <label>Phone:</label>
+        <input type="text" th:field="*{phoneNumber}"/>
+        
+        <label>Gender:</label>
+        <select th:field="*{gender}">
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select>
+  
+        <input type="hidden" th:field="*{role}"/>
+        <input type="hidden" th:field="*{memberId}"/>
+        
+        <button type="submit">Register</button>
+        <p><a th:href="@{/auth/login}">Already have account? Login</a></p>
+    </form>
+</div>
+
+</body>
+</html>

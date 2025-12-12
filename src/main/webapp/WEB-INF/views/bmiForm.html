@@ -1,0 +1,5 @@
+<form th:action="@{/bmi}" method="post" th:object="${person}">
+  Name: <input th:field="*{name}" />
+  Year of Birth: <input th:field="*{yob}" />
+  <button type="submit">Calculate BMI</button>
+</form>
