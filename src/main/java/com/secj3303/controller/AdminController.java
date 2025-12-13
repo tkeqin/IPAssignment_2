@@ -14,7 +14,7 @@ public class AdminController {
     // You will need this DAO for Admin-specific functionality
     // @Autowired
  
-    
+
     // Helper method for manual role check
     private boolean checkRole(HttpSession session, String expectedRole) {
         String currentRole = (String) session.getAttribute("role");
@@ -29,7 +29,7 @@ public class AdminController {
 
         String fullName = (String) session.getAttribute("fullName");
         
-        model.addAttribute("fullName", fullName);
+        model.addAttribute("adminName", fullName);
 
         return "admin/admin-dashboard"; 
     }
