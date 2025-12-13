@@ -36,7 +36,7 @@ public class MemberController {
     @GetMapping("/dashboard")
     public String memberDashboard(HttpSession session, Model model) {
         if (!checkRole(session, "member")) {
-            return "redirect:/login"; // Redirect if not a member
+            return "redirect:auth/login"; // Redirect if not a member
         }
 
         // Get basic user info from session for personalization
@@ -57,7 +57,7 @@ public class MemberController {
 
     @GetMapping("/bmi")
     public String showBmiForm(HttpSession session, Model model) {
-        if (!checkRole(session, "member")) { return "redirect:/login"; }
+        if (!checkRole(session, "member")) { return "redirect:auth/login"; }
 
         int memberId = (int) session.getAttribute("personId");
         
@@ -72,7 +72,7 @@ public class MemberController {
 
     @PostMapping("/bmi/calculate")
     public String calculateAndSaveBmi(@ModelAttribute("bmiRecord") BmiRecord newRecord, HttpSession session) {
-        if (!checkRole(session, "member")) { return "redirect:/login"; }
+        if (!checkRole(session, "member")) { return "redirect:auth/login"; }
         
         int memberId = (int) session.getAttribute("personId");
         Person member = personDao.findById(memberId); // Get the associated Person object
@@ -97,7 +97,7 @@ public class MemberController {
 
     @GetMapping("/bmi/history")
     public String showBmiHistory(HttpSession session, Model model) {
-        if (!checkRole(session, "member")) { return "redirect:/login"; }
+        if (!checkRole(session, "member")) { return "redirect:auth/login"; }
         
         int memberId = (int) session.getAttribute("personId");
         
