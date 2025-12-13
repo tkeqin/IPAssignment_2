@@ -104,6 +104,6 @@ public class MemberController {
         List<BmiRecord> history = bmiRecordDao.findByMemberId(memberId);
         model.addAttribute("bmiHistory", history);
         
-        return "member-bmi-history";
+        return "member/member-bmi-history";
     }
 }
