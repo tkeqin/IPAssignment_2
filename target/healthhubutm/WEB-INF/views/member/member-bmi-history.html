@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>BMI History - HealthHub@UTM</title>
+</head>
+<body>
+
+
+    <div class="container py-5">
+        
+        <h1 class="mb-4 text-primary"><i class="fas fa-chart-line me-2"></i> Your BMI History</h1>
+        <p class="lead text-muted">Review your health metrics and track your progress over time.</p>
+        
+        <hr>
+
+        <a th:href="@{/member/bmi}" class="btn btn-sm btn-outline-secondary mb-4">
+            <i class="fas fa-plus me-1"></i> Record New BMI
+        </a>
+
+        <div th:if="${bmiHistory != null and not #lists.isEmpty(bmiHistory)}">
+            
+            <div class="table-responsive shadow-sm rounded">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Date Recorded</th>
+                            <th>Height (cm)</th>
+                            <th>Weight (kg)</th>
+                            <th>BMI Value</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="record, iterStat : ${bmiHistory}">
+                            <td th:text="${iterStat.count}">1</td>
+                            <td th:text="${#temporals.format(record.recordDate, 'dd-MM-yyyy HH:mm')}">2023-10-27 10:00</td>
+                            <td th:text="${#numbers.formatDecimal(record.heightCm, 1, 2)}">170.00</td>
+                            <td th:text="${#numbers.formatDecimal(record.weightKg, 1, 2)}">70.00</td>
+                            <td class="fw-bold" th:text="${#numbers.formatDecimal(record.bmiValue, 1, 2)}">24.22</td>
+                            
+                            <td th:with="bmi=${record.bmiValue}">
+                                <span th:if="${bmi < 18.5}" class="badge bg-warning text-dark">Underweight</span>
+                                <span th:if="${bmi >= 18.5 and bmi < 24.9}" class="badge bg-success">Normal Weight</span>
+                                <span th:if="${bmi >= 25.0 and bmi < 29.9}" class="badge bg-warning text-dark">Overweight</span>
+                                <span th:if="${bmi >= 30.0}" class="badge bg-danger">Obesity</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        
+        <div th:unless="${bmiHistory != null and not #lists.isEmpty(bmiHistory)}" class="alert alert-info mt-4" role="alert">
+            <h4 class="alert-heading">No History Found!</h4>
+            <p>You have not recorded any BMI data yet. Please use the button above to record your first metric.</p>
+        </div>
+
+    </div>
+    
+</body>
+</html>
