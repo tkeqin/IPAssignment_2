@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Enter BMI - HealthHub@UTM</title>
+    <div th:replace="member/header :: header-css"></div>
+    <style>
+        :root {
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .page-header {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: var(--primary-gradient);
+            opacity: 0.05;
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--info-gradient);
+        }
+        
+        .status-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--success-gradient);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        
+        .form-label i {
+            margin-right: 0.5rem;
+            color: #667eea;
+        }
+        
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.875rem 1.25rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
+            outline: none;
+        }
+        
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            width: 100%;
+            font-size: 1.05rem;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            color: white;
+        }
+        
+        .bmi-value-display {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f7fafc;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .info-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-label i {
+            margin-right: 0.75rem;
+            color: #667eea;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .info-value {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+        
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+        
+        .badge-underweight {
+            background: rgba(250, 112, 154, 0.1);
+            color: #fa709a;
+        }
+        
+        .badge-normal {
+            background: rgba(56, 239, 125, 0.1);
+            color: #11998e;
+        }
+        
+        .badge-overweight {
+            background: rgba(254, 225, 64, 0.1);
+            color: #f59e0b;
+        }
+        
+        .badge-obese {
+            background: rgba(254, 87, 34, 0.1);
+            color: #fe5722;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 0.75rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.2rem;
+        }
+        
+        .icon-form {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            color: #4facfe;
+        }
+        
+        .icon-status {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.1) 0%, rgba(56, 239, 125, 0.1) 100%);
+            color: #11998e;
+        }
+        
+        .link-styled {
+            display: inline-flex;
+            align-items: center;
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .link-styled:hover {
+            color: #764ba2;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .link-styled i {
+            margin-right: 0.5rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #718096;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e0;
+            margin-bottom: 1rem;
+        }
+        
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .role-badge i {
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+    </head>
+<body>
+
+    <div th:replace="member/header :: header-nav"></div>
+
+    <div class="container py-5">
+        
+        <div class="page-header animate-in">
+            <h1 class="page-title">BMI Calculator</h1>
+            <p class="text-muted mb-2">Track your Body Mass Index and monitor your health journey</p>
+            <span class="role-badge">
+                <i class="fas fa-user"></i>
+                <span th:text="${session.role}">Member</span>
+            </span>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="form-card animate-in">
+                    <h3 class="section-title">
+                        <i class="fas fa-calculator icon-form"></i>
+                        Enter Your Measurements
+                    </h3>
+                    
+                    <form th:action="@{/member/bmi/calculate}" th:object="${bmiRecord}" method="post">
+                        <div class="mb-4">
+                            <label for="heightCm" class="form-label">
+                                <i class="fas fa-ruler-vertical"></i>
+                                Height (cm)
+                            </label>
+                            <input type="number" step="0.01" th:field="*{heightCm}" id="heightCm" required class="form-control" placeholder="Enter your height in centimeters">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="weightKg" class="form-label">
+                                <i class="fas fa-weight-scale"></i>
+                                Weight (kg)
+                            </label>
+                            <input type="number" step="0.01" th:field="*{weightKg}" id="weightKg" required class="form-control" placeholder="Enter your weight in kilograms">
+                        </div>
+                        
+                        <button type="submit" class="btn-gradient">
+                            <i class="fas fa-check-circle me-2"></i>Calculate & Save BMI
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="status-card animate-in">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line icon-status"></i>
+                        Current BMI Status
+                    </h3>
+                    
+                    <div th:if="${latestBmi}">
+                        <div class="text-center mb-4">
+                            <p class="bmi-value-display" th:text="${latestBmi.bmiValue}">23.5</p>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-ruler-vertical"></i>
+                                Height
+                            </span>
+                            <span class="info-value">
+                                <span th:text="${latestBmi.heightCm}">170</span> cm
+                            </span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-weight-scale"></i>
+                                Weight
+                            </span>
+                            <span class="info-value">
+                                <span th:text="${latestBmi.weightKg}">68</span> kg
+                            </span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="fas fa-calendar"></i>
+                                Recorded On
+                            </span>
+                            <span class="info-value" th:text="${#temporals.format(latestBmi.recordDate, 'dd-MM-yyyy HH:mm')}">13-12-2025 14:30</span>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <div th:with="bmi=${latestBmi.bmiValue}">
+                                <span th:if="${bmi < 18.5}" class="category-badge badge-underweight">
+                                    <i class="fas fa-exclamation-circle me-2"></i>Underweight
+                                </span>
+                                <span th:if="${bmi >= 18.5 and bmi < 24.9}" class="category-badge badge-normal">
+                                    <i class="fas fa-check-circle me-2"></i>Normal Weight
+                                </span>
+                                <span th:if="${bmi >= 25.0 and bmi < 29.9}" class="category-badge badge-overweight">
+                                    <i class="fas fa-info-circle me-2"></i>Overweight
+                                </span>
+                                <span th:if="${bmi >= 30.0}" class="category-badge badge-obese">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Obesity
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:unless="${latestBmi}" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p class="mb-0">No BMI records found. Please enter your measurements to get started.</p>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a th:href="@{/member/bmi/history}" class="link-styled">
+                            <i class="fas fa-history"></i>
+                            View Full BMI History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div th:replace="member/footer :: footer"></div>
+</body>
+</html>
