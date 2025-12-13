@@ -1,4 +1,4 @@
-package com.secj3303.dao;
+/**package com.secj3303.dao;
 import java.util.List;
 
 import com.secj3303.model.Member;
@@ -17,3 +17,4 @@ public interface MemberDao {
     // Custom method to get members only
     List<Member> findAllMembers();
 }
+ **/

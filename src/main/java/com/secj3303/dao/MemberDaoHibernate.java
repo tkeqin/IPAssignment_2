@@ -1,3 +1,4 @@
+/*
 package com.secj3303.dao;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class MemberDaoHibernate implements MemberDao {
 
     /**
      * Inserts a new Person record and returns the generated ID.
-     */
+                                
     @Override
     @Transactional
     public int insert(Member p) {
@@ -47,7 +48,7 @@ public class MemberDaoHibernate implements MemberDao {
 
     /**
      * Updates an existing Person record.
-     */
+     *//** 
     @Override
     @Transactional
     public void update(Member p) {
@@ -57,7 +58,7 @@ public class MemberDaoHibernate implements MemberDao {
 
     /**
      * Deletes a Person by ID. Returns 1 if deleted, 0 otherwise.
-     */
+     
     @Override
     @Transactional
     public int delete(int id) {
@@ -91,3 +92,4 @@ public class MemberDaoHibernate implements MemberDao {
         return query.getResultList();
     }
 }
+*/

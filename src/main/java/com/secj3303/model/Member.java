@@ -1,4 +1,4 @@
-package com.secj3303.model;
+/**package com.secj3303.model;
 
 import java.time.LocalDate;
 
@@ -165,4 +165,4 @@ public class Member {
 
     public String getGender() { return gender; }
     public void setGender(String gender) { this.gender = gender; }
-}
+} **/

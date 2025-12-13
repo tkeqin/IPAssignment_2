@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Member Dashboard - HealthHub@UTM</title>
+    <div th:replace="fragments/header :: header-css"></div> 
+</head>
+<body>
+
+    <div th:replace="fragments/header :: header-nav"></div>
+
+    <div class="container">
+        <h1 class="mb-4">👋 Welcome, <span th:text="${fullName}">Member Name</span>!</h1>
+        <p class="lead">This is your HealthHub@UTM personalized dashboard. You are logged in as a <strong><span th:text="${session.role}"></span></strong>.</p>
+        
+        <hr>
+
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-heartbeat"></i> Latest Health Metrics
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${latestBmi}">
+                            <p class="card-text"><strong>Current BMI:</strong> <span th:text="${latestBmi.bmiValue}"></span></p>
+                            <p class="card-text"><strong>Weight:</strong> <span th:text="${latestBmi.weightKg}"></span> kg</p>
+                            <a th:href="@{/member/bmi/history}" class="btn btn-sm btn-outline-info">View Full BMI History</a>
+                        </div>
+                        <div th:unless="${latestBmi}">
+                            <p class="card-text text-warning">No BMI recorded yet.</p>
+                            <a th:href="@{/member/bmi}" class="btn btn-sm btn-warning">Record First BMI</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-list-check"></i> Current Workout Plan
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-muted">No active plan assigned yet.</p>
+                        <a th:href="@{/member/plan}" class="btn btn-sm btn-outline-success">Manage Your Workout Plan</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2 class="mb-3">Quick Actions & Modules</h2>
+        <div class="list-group">
+            
+            <a th:href="@{/member/bmi}" class="list-group-item list-group-item-action">
+                <i class="fas fa-calculator me-2"></i> Enter BMI & View History
+            </a>
+            
+            <a th:href="@{/member/programs}" class="list-group-item list-group-item-action">
+                <i class="fas fa-dumbbell me-2"></i> Browse & Enroll in Programs
+            </a>
+            
+            <a th:href="@{/member/plan}" class="list-group-item list-group-item-action">
+                <i class="fas fa-tasks me-2"></i> Manage Personal Workout Plan
+            </a>
+            
+             <a th:href="@{/member/schedule}" class="list-group-item list-group-item-action">
+                <i class="fas fa-calendar-alt me-2"></i> View Session Schedule
+            </a>
+            
+        </div>
+        
+    </div>
+    
+    <div th:replace="fragments/footer :: footer"></div> 
+</body>
+</html>
