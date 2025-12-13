@@ -35,7 +35,7 @@ public class TrainerController {
         // Optional: Fetch quick summary data for the dashboard (e.g., plans created, members assigned)
         // Example: List<FitnessPlan> recentPlans = fitnessPlanDao.findRecentPlans((int) session.getAttribute("personId"));
         
-        model.addAttribute("fullName", fullName);
+        model.addAttribute("trainerName", fullName);
         // model.addAttribute("recentPlans", recentPlans);
         
         // Return the dashboard view
