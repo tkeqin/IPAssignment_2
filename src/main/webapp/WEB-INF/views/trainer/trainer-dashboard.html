@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Dashboard - HealthHub@UTM</title>
+    <div th:replace="trainer/header :: header-css"></div>
+    <style>
+        :root {
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --danger-gradient: linear-gradient(135deg, #fe5722 0%, #ff9a44 100%);
+        }
+        
+        .hero-section {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: var(--primary-gradient);
+            opacity: 0.05;
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .role-badge i {
+            margin-right: 0.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        
+        .stat-card.primary::before {
+            background: var(--primary-gradient);
+        }
+        
+        .stat-card.success::before {
+            background: var(--success-gradient);
+        }
+        
+        .stat-card.info::before {
+            background: var(--info-gradient);
+        }
+        
+        .stat-card.warning::before {
+            background: var(--warning-gradient);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .icon-primary {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+        }
+        
+        .icon-success {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.1) 0%, rgba(56, 239, 125, 0.1) 100%);
+            color: #11998e;
+        }
+        
+        .icon-info {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            color: #4facfe;
+        }
+        
+        .icon-warning {
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
+            color: #fa709a;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+        
+        .module-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-decoration: none;
+            display: block;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .module-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        .module-card:hover::before {
+            opacity: 0.05;
+        }
+        
+        .module-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .module-card:hover .module-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .module-card h5 {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        
+        .module-card p {
+            color: #718096;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            margin-bottom: 0;
+        }
+        
+        /* Footer styles moved to trainer/footer fragment */
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+    </style>
+    </head>
+<body>
+
+    <div th:replace="trainer/header :: header-nav"></div>
+
+    <div class="container py-5">
+        
+        <div class="hero-section animate-in">
+            <h1 class="hero-title floating">Trainer Dashboard</h1>
+            <p class="lead text-muted mb-2">
+                Welcome back, <span class="fw-bold" th:text="${trainerName}">Trainer Name</span>. Manage your fitness programs and track member progress.
+            </p>
+            <span class="role-badge">
+                <i class="fas fa-user-tie"></i>
+                Professional Trainer
+            </span>
+        </div>
+
+        <div class="stats-grid animate-in stagger-1">
+            <div class="stat-card primary">
+                <div class="stat-icon icon-primary">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="stat-value" th:text="${activePlans != null ? activePlans : 0}">12</div>
+                <div class="stat-label">Active Plans</div>
+            </div>
+            
+            <div class="stat-card success">
+                <div class="stat-icon icon-success">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" th:text="${totalMembers != null ? totalMembers : 0}">28</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+            
+            <div class="stat-card info">
+                <div class="stat-icon icon-info">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-value" th:text="${upcomingSessions != null ? upcomingSessions : 0}">7</div>
+                <div class="stat-label">Upcoming Sessions</div>
+            </div>
+            
+            <div class="stat-card warning">
+                <div class="stat-icon icon-warning">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-value" th:text="${completionRate != null ? completionRate + '%' : '85%'}">85%</div>
+                <div class="stat-label">Completion Rate</div>
+            </div>
+        </div>
+
+        <h2 class="section-title animate-in stagger-2">Quick Actions</h2>
+        
+        <div class="row g-4 animate-in stagger-3">
+            <div class="col-lg-3 col-md-6">
+                <a th:href="@{/trainer/plans/create}" class="module-card">
+                    <div class="module-icon icon-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h5>Create Fitness Plan</h5>
+                    <p>Design new workout programs and fitness challenges for members</p>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <a th:href="@{/trainer/plans/assign}" class="module-card">
+                    <div class="module-icon icon-success">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h5>Assign Plans</h5>
+                    <p>Match members with appropriate fitness programs</p>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <a th:href="@{/trainer/members/progress}" class="module-card">
+                    <div class="module-icon icon-info">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h5>Monitor Progress</h5>
+                    <p>Track member performance and achievement metrics</p>
+                </a>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <a th:href="@{/trainer/sessions/schedule}" class="module-card">
+                    <div class="module-icon icon-warning">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h5>Schedule Sessions</h5>
+                    <p>Manage training appointments and availability</p>
+                </a>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div th:replace="trainer/footer :: footer"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
