@@ -67,7 +67,7 @@ public class MemberController {
         model.addAttribute("bmiRecord", new BmiRecord()); // For the form input
         model.addAttribute("latestBmi", latestBmi); // To show the current status
         
-        return "bmiForm";
+        return "member/bmiForm";
     }
 
     @PostMapping("/bmi/calculate")
