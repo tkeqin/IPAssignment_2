@@ -50,7 +50,7 @@ public class TrainerController {
         String trainerName = (String) session.getAttribute("fullName");
 
         // Fetch stats
-        List<PlanAssignment> assignments = trainerDao.findAssignmentsByTrainer(trainerId);
+       // List<PlanAssignment> assignments = trainerDao.findAssignmentsByTrainer(trainerId);
         List<TrainingSession> sessions = trainerDao.findSessionsByTrainer(trainerId);
         List<FitnessPlan> allPlans = trainerDao.findAllPlans(); 
         
