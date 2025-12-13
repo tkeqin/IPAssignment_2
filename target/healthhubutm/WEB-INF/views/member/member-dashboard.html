@@ -1,167 +1,307 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Dashboard - HealthHub@UTM</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <div th:replace="member/header :: header-css"></div>
     <style>
-        .module-card {
-            transition: transform 0.2s;
+        :root {
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
+        
+        .hero-section {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: var(--primary-gradient);
+            opacity: 0.05;
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .bmi-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .bmi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--success-gradient);
+        }
+        
+        .bmi-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+        }
+        
+        .bmi-value {
+            font-size: 4rem;
+            font-weight: 800;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        
+        .module-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-decoration: none;
+            display: block;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+        
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
         .module-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        .module-card:hover::before {
+            opacity: 0.05;
+        }
+        
+        .module-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .module-card:hover .module-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .icon-primary {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+        }
+        
+        .icon-success {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.1) 0%, rgba(56, 239, 125, 0.1) 100%);
+            color: #11998e;
+        }
+        
+        .icon-warning {
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.1) 0%, rgba(254, 225, 64, 0.1) 100%);
+            color: #fa709a;
+        }
+        
+        .icon-info {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+            color: #4facfe;
+        }
+        
+        .module-card h5 {
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .module-card p {
+            color: #718096;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+            color: white;
+        }
+        
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+        
+        .date-badge {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
         }
     </style>
-</head>
+    </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="#">HealthHub@UTM</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/member/dashboard}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/member/bmi}">BMI</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/auth/logout}">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <div th:replace="member/header :: header-nav"></div>
 
     <div class="container py-5">
         
-        <h1 class="mb-1 text-primary">HealthHub Dashboard</h1>
-        <p class="lead text-muted mb-4">
-            Welcome back, <span th:text="${fullName}">Member Name</span>. Here is an overview of your progress.
-        </p>
-
-        <div class="row g-4 mb-5">
-            
-            <div class="col-md-6">
-                <div class="card shadow-lg border-0 h-100 bg-light">
-                    <div class="card-body">
-                        <h4 class="card-title text-success"><i class="fas fa-calculator me-2"></i> Current BMI</h4>
-                        <hr>
-                        <div th:if="${latestBmi}">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <p class="display-4 mb-0 text-success" th:text="${latestBmi.bmiValue}"></p>
-                                <p class="mb-0">
-                                    <span class="badge bg-secondary" th:text="${#temporals.format(latestBmi.recordDate, 'dd MMM')}"></span>
-                                </p>
-                            </div>
-                            <p class="mt-2">
-                                **Status:** <span th:with="bmi=${latestBmi.bmiValue}">
-                                    <span th:if="${bmi < 18.5}" class="text-warning fw-bold">Underweight</span>
-                                    <span th:if="${bmi >= 18.5 and bmi < 24.9}" class="text-success fw-bold">Normal Weight</span>
-                                    <span th:if="${bmi >= 25.0}" class="text-danger fw-bold">Overweight/Obese</span>
-                                </span>
-                            </p>
-                            <a th:href="@{/member/bmi/history}" class="btn btn-sm btn-outline-primary mt-2">View History</a>
-                        </div>
-                        <div th:unless="${latestBmi}">
-                            <p class="card-text text-muted">No BMI recorded yet.</p>
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!--<div class="col-md-6">
-                <div class="card shadow-lg border-0 h-100">
-                    <div class="card-body">
-                        <h4 class="card-title text-info"><i class="fas fa-list-check me-2"></i> Active Plan</h4>
-                        <hr>
-                        <p class="display-4 mb-0 text-info">45%</p>
-                        <p class="text-muted">Progression towards 'Beginner Strength' plan.</p>
-                        <a th:href="@{/member/plan}" class="btn btn-sm btn-outline-info mt-2">Manage Plan</a>
-                    </div>
-                </div>
-            </div>-->
+        <div class="hero-section">
+            <h1 class="hero-title floating">Welcome Back!</h1>
+            <p class="lead text-muted mb-0">
+                Hi <span class="fw-bold" th:text="${fullName}">Member Name</span>, here's an overview of your health journey.
+            </p>
         </div>
 
-        <h2 class="mb-4 text-secondary">Your Health Modules</h2>
+        <div class="row g-4 mb-5">
+            <div class="col-lg-6">
+                <div class="bmi-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-success module-icon me-3" style="width: 60px; height: 60px; margin: 0;">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <h4 class="mb-0 fw-bold text-dark">Current BMI</h4>
+                    </div>
+                    <hr class="my-3">
+                    <div th:if="${latestBmi}">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <p class="bmi-value mb-0" th:text="${latestBmi.bmiValue}">23.5</p>
+                            <span class="date-badge" th:text="${#temporals.format(latestBmi.recordDate, 'dd MMM yyyy')}">13 Dec 2025</span>
+                        </div>
+                        <div th:with="bmi=${latestBmi.bmiValue}">
+                            <span th:if="${bmi < 18.5}" class="status-badge" style="background: rgba(250, 112, 154, 0.1); color: #fa709a;">
+                                <i class="fas fa-exclamation-circle me-2"></i>Underweight
+                            </span>
+                            <span th:if="${bmi >= 18.5 and bmi < 24.9}" class="status-badge" style="background: rgba(56, 239, 125, 0.1); color: #11998e;">
+                                <i class="fas fa-check-circle me-2"></i>Normal Weight
+                            </span>
+                            <span th:if="${bmi >= 25.0}" class="status-badge" style="background: rgba(254, 87, 34, 0.1); color: #fe5722;">
+                                <i class="fas fa-info-circle me-2"></i>Overweight/Obese
+                            </span>
+                        </div>
+                        <a th:href="@{/member/bmi/history}" class="btn btn-gradient mt-4">
+                            <i class="fas fa-chart-line me-2"></i>View History
+                        </a>
+                    </div>
+                    <div th:unless="${latestBmi}">
+                        <p class="text-muted mb-3">No BMI recorded yet. Start tracking your health today!</p>
+                        <a th:href="@{/member/bmi}" class="btn btn-gradient">
+                            <i class="fas fa-plus me-2"></i>Add First Record
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">Your Health Modules</h2>
         
         <div class="row g-4">
-            
             <div class="col-lg-4 col-md-6">
-                <a th:href="@{/member/bmi}" class="text-decoration-none">
-                    <div class="card shadow-sm border-0 module-card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-weight-scale fa-3x text-primary mb-3"></i>
-                            <h5 class="card-title">Enter & Track BMI</h5>
-                            <p class="card-text text-muted">Monitor your Body Mass Index and view your progress over time.</p>
-                        </div>
+                <a th:href="@{/member/bmi}" class="module-card">
+                    <div class="module-icon icon-primary">
+                        <i class="fas fa-weight-scale"></i>
                     </div>
+                    <h5 class="text-center">Enter & Track BMI</h5>
+                    <p class="text-center mb-0">Monitor your Body Mass Index and view your progress over time.</p>
                 </a>
             </div>
-            
-            <!--<div class="col-lg-4 col-md-6">
-                <a th:href="@{/member/programs}" class="text-decoration-none">
-                    <div class="card shadow-sm border-0 module-card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-search fa-3x text-success mb-3"></i>
-                            <h5 class="card-title">Browse Programs</h5>
-                            <p class="card-text text-muted">Find fitness challenges and programs created by our trainers.</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <a th:href="@{/member/programs/enrollment}" class="text-decoration-none">
-                    <div class="card shadow-sm border-0 module-card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-file-signature fa-3x text-warning mb-3"></i>
-                            <h5 class="card-title">Your Enrollment</h5>
-                            <p class="card-text text-muted">View your active and completed program enrollment status.</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <a th:href="@{/member/plan}" class="text-decoration-none">
-                    <div class="card shadow-sm border-0 module-card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-tasks fa-3x text-info mb-3"></i>
-                            <h5 class="card-title">Manage Workout Plan</h5>
-                            <p class="card-text text-muted">View and log progress on your trainer-assigned fitness plan.</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            
-             <div class="col-lg-4 col-md-6">
-                <a th:href="@{/member/schedule}" class="text-decoration-none">
-                    <div class="card shadow-sm border-0 module-card h-100">
-                        <div class="card-body text-center">
-                            <i class="fas fa-calendar-alt fa-3x text-secondary mb-3"></i>
-                            <h5 class="card-title">Session Schedule</h5>
-                            <p class="card-text text-muted">Book or check your upcoming personal training sessions.</p>
-                        </div>
-                    </div>
-                </a>
-            </div>-->
-            
         </div>
         
     </div>
     
-    <footer class="bg-light text-center py-3 mt-5">
-        <p class="text-muted mb-0">&copy; 2025 HealthHub@UTM. All rights reserved.</p>
-    </footer>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div th:replace="member/footer :: footer"></div>
 </body>
 </html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Schedule - HealthHub@UTM</title>
+    <div th:replace="trainer/header :: header-css"></div>
+</head>
+<body>
+    <div th:replace="trainer/header :: header-nav"></div>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">My Training Schedule</h2>
+            <a th:href="@{/trainer/sessions/schedule}" class="btn btn-warning text-white rounded-pill shadow-sm">
+                <i class="fas fa-plus me-2"></i>New Session
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" th:each="sess : ${sessions}">
+                <div class="card border-0 shadow-sm h-100 rounded-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="badge" 
+                                  th:classappend="${sess.status == 'Completed' ? 'bg-success' : 'bg-light text-dark border'}"
+                                  th:text="${sess.status}">Scheduled</span>
+                            
+                            <small class="text-muted" th:text="${#temporals.format(sess.sessionDate, 'dd MMM yyyy')}">Date</small>
+                        </div>
+                        
+                        <!-- UPDATED: Removed Member Name logic, just showing generic Title -->
+                        <h4 class="fw-bold mb-1">
+                            <span class="text-success">
+                                <i class="fas fa-dumbbell me-2"></i>Training Slot
+                            </span>
+                        </h4>
+
+                        <p class="text-primary fw-bold mb-3">
+                            <i class="far fa-clock me-1"></i>
+                            <span th:text="${sess.startTime}">10:00</span>
+                            <span> - </span>
+                            <span th:text="${sess.endTime}">11:00</span>
+                        </p>
+                        
+                        <div class="p-3 bg-light rounded-3 mb-3">
+                            <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Remarks</small>
+                            <span th:text="${sess.remarks != null && sess.remarks != '' ? sess.remarks : 'No remarks'}">Notes</span>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div th:if="${sess.status != 'Completed'}">
+                            <form th:action="@{/trainer/sessions/complete}" method="post">
+                                <input type="hidden" name="sessionId" th:value="${sess.sessionId}" />
+                                <button type="submit" class="btn btn-outline-success w-100 rounded-pill">
+                                    <i class="fas fa-check me-2"></i>Mark Complete
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div th:if="${sess.status == 'Completed'}">
+                            <button class="btn btn-success w-100 rounded-pill" disabled>
+                                <i class="fas fa-check-double me-2"></i>Completed
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(sessions)}" class="text-center py-5 text-muted">
+            <p>No sessions scheduled.</p>
+        </div>
+    </div>
+</body>
+</html>

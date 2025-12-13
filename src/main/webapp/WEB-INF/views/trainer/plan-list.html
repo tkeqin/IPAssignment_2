@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Fitness Plans - HealthHub@UTM</title>
+    <div th:replace="trainer/header :: header-css"></div>
+</head>
+<body>
+
+    <div th:replace="trainer/header :: header-nav"></div>
+
+    <div class="container py-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-primary">Fitness Plan Templates</h2>
+                <p class="text-muted">Manage the workout routines available for members.</p>
+            </div>
+            <a th:href="@{/trainer/plans/create}" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                <i class="fas fa-plus-circle me-2"></i>Create New Plan
+            </a>
+        </div>
+        
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="p-4">Plan Name</th>
+                                <th>Difficulty</th>
+                                <th>Duration</th>
+                                <th>Description</th>
+                                <!-- Actions Column Removed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="plan : ${plans}">
+                                <td class="p-4 fw-bold text-dark" th:text="${plan.planName}">Weight Loss</td>
+                                <td>
+                                    <span class="badge rounded-pill" 
+                                          th:classappend="${plan.difficultyLevel == 'Beginner' ? 'bg-success' : (plan.difficultyLevel == 'Intermediate' ? 'bg-warning text-dark' : 'bg-danger')}"
+                                          th:text="${plan.difficultyLevel}">Beginner</span>
+                                </td>
+                                <td>
+                                    <span th:text="${plan.durationWeeks}">4</span> Weeks
+                                </td>
+                                <td class="text-muted text-truncate" style="max-width: 250px;" th:text="${plan.description}">
+                                    Routine details...
+                                </td>
+                                <!-- Actions Cell Removed -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(plans)}" class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-dumbbell fa-4x text-light"></i>
+                    </div>
+                    <h5 class="text-muted">No fitness plans found.</h5>
+                    <p class="text-muted small">Create your first template to get started.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Include Footer if you have one -->
+    <div th:replace="trainer/footer :: footer"></div>
+
+</body>
+</html>

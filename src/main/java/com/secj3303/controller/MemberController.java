@@ -12,11 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.secj3303.dao.BmiRecordDao;
 import com.secj3303.dao.PersonDao;
+import com.secj3303.dao.TrainerDao; // Import the Trainer DAO
 import com.secj3303.model.BmiRecord;
 import com.secj3303.model.Person;
+import com.secj3303.model.PlanAssignment; // Import PlanAssignment model
 
 @Controller
 @RequestMapping("/member")
@@ -26,7 +29,10 @@ public class MemberController {
     private BmiRecordDao bmiRecordDao;
     
     @Autowired
-    private PersonDao personDao; // Needed to fetch the full Person object
+    private PersonDao personDao;
+
+    @Autowired
+    private TrainerDao trainerDao; // Injected for Plan operations
 
     // Helper method for manual role check
     private boolean checkRole(HttpSession session, String expectedRole) {
@@ -36,46 +42,45 @@ public class MemberController {
     @GetMapping("/dashboard")
     public String memberDashboard(HttpSession session, Model model) {
         if (!checkRole(session, "member")) {
-            return "auth/login"; // Redirect if not a member
+            return "redirect:/auth/login"; 
         }
 
         // Get basic user info from session for personalization
         String fullName = (String) session.getAttribute("fullName");
         
-        // Optional: Fetch the latest BMI record to display on the dashboard summary
+        // Fetch the latest BMI record
         int memberId = (int) session.getAttribute("personId");
         BmiRecord latestBmi = bmiRecordDao.findLatestByMemberId(memberId);
         
         model.addAttribute("fullName", fullName);
         model.addAttribute("latestBmi", latestBmi);
         
-        // Return the dashboard view
-        return "member/member-dashboard"; // Maps to member-dashboard.html
+        return "member/member-dashboard";
     }
     
     // --- BMI Functionality ---
 
     @GetMapping("/bmi")
     public String showBmiForm(HttpSession session, Model model) {
-        if (!checkRole(session, "member")) { return "auth/login"; }
+        if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
 
         int memberId = (int) session.getAttribute("personId");
         
         // Load latest BMI for display
         BmiRecord latestBmi = bmiRecordDao.findLatestByMemberId(memberId);
         
-        model.addAttribute("bmiRecord", new BmiRecord()); // For the form input
-        model.addAttribute("latestBmi", latestBmi); // To show the current status
+        model.addAttribute("bmiRecord", new BmiRecord()); 
+        model.addAttribute("latestBmi", latestBmi); 
         
         return "member/bmiForm";
     }
 
     @PostMapping("/bmi/calculate")
     public String calculateAndSaveBmi(@ModelAttribute("bmiRecord") BmiRecord newRecord, HttpSession session) {
-        if (!checkRole(session, "member")) { return "auth/login"; }
+        if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
         
         int memberId = (int) session.getAttribute("personId");
-        Person member = personDao.findById(memberId); // Get the associated Person object
+        Person member = personDao.findById(memberId); 
 
         // 1. BMI Calculation
         double heightInMeters = newRecord.getHeightCm() / 100.0;
@@ -87,17 +92,17 @@ public class MemberController {
         // 2. Set necessary fields before saving
         newRecord.setBmiValue(bmiValue);
         newRecord.setRecordDate(LocalDateTime.now());
-        newRecord.setMember(member); // Set the foreign key reference
+        newRecord.setMember(member); 
         
-        // 3. Save to Database using Hibernate
+        // 3. Save to Database
         bmiRecordDao.save(newRecord);
 
-        return "redirect:/member/bmi"; // Redirect back to show updated result
+        return "redirect:/member/bmi"; 
     }
 
     @GetMapping("/bmi/history")
     public String showBmiHistory(HttpSession session, Model model) {
-        if (!checkRole(session, "member")) { return "auth/login"; }
+        if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
         
         int memberId = (int) session.getAttribute("personId");
         
@@ -105,5 +110,42 @@ public class MemberController {
         model.addAttribute("bmiHistory", history);
         
         return "member/member-bmi-history";
+    }
+
+    // --- NEW: Fitness Plan Functionality ---
+
+    // 1. Member's My Plans Page
+    @GetMapping("/my-plans")
+    public String viewMyPlans(HttpSession session, Model model) {
+        if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
+
+        int memberId = (int) session.getAttribute("personId");
+        
+        // Fetch assignments for this logged-in member using the TrainerDAO
+        List<PlanAssignment> myAssignments = trainerDao.findAllAssignmentsByMemberId(memberId);
+        
+        model.addAttribute("assignments", myAssignments);
+        return "member/my-plans";
+    }
+
+    // 2. Update Plan Status (Member Action)
+    @PostMapping("/plans/updateStatus")
+    public String updatePlanStatus(@RequestParam("assignmentId") int assignmentId,
+                                   @RequestParam("status") String status,
+                                   HttpSession session) {
+        if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
+
+        int memberId = (int) session.getAttribute("personId");
+
+        // Securely find the assignment to ensure it belongs to this member
+        // (You must have added findAssignmentByMemberAndId to TrainerModuleDao as discussed previously)
+        PlanAssignment assignment = trainerDao.findAssignmentByMemberAndId(memberId, assignmentId);
+        
+        if (assignment != null) {
+            assignment.setStatus(status);
+            trainerDao.saveAssignment(assignment);
+        }
+
+        return "redirect:/member/my-plans";
     }
 }

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Fitness Plans - HealthHub@UTM</title>
+    <!-- Header CSS -->
+    <div th:replace="member/header :: header-css"></div>
+    
+    <!-- Reuse your existing styles if available -->
+    <style>
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-light">
+    
+    <!-- Include your navigation bar here (e.g., th:replace="fragments/header :: nav") -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/member/dashboard">HealthHub Member</a>
+             <div class="ms-auto">
+                <a href="/member/dashboard" class="text-white me-3 text-decoration-none">Dashboard</a>
+                <a href="/auth/logout" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        
+        <!-- Back Link -->
+        <a href="/member/dashboard" class="text-decoration-none text-muted mb-3 d-inline-block">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h2 class="fw-bold text-primary">My Assigned Plans</h2>
+                <p class="text-muted">Update your progress so your trainer can track your journey.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Loop through assignments -->
+            <div class="col-lg-6" th:each="assign : ${assignments}">
+                <div class="card shadow-sm border-0 rounded-4 h-100 card-hover">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h4 class="fw-bold mb-1" th:text="${assign.fitnessPlan.planName}">Plan Name</h4>
+                                <small class="text-muted">Assigned by: <span th:text="${assign.trainer.fullName}">Trainer</span></small>
+                            </div>
+                            <span class="badge px-3 py-2 rounded-pill" 
+                                  th:classappend="${assign.status == 'Active' ? 'bg-primary' : (assign.status == 'Completed' ? 'bg-success' : 'bg-secondary')}"
+                                  th:text="${assign.status}">Active</span>
+                        </div>
+
+                        <div class="p-3 bg-light rounded-3 mb-4">
+                            <p class="mb-0 small" style="white-space: pre-line;" th:text="${assign.fitnessPlan.description}">Description...</p>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="small text-muted">
+                                <i class="far fa-calendar-alt me-1"></i>
+                                <span th:text="${assign.assignedDate}">2023-10-01</span>
+                            </div>
+                            
+                            <!-- Action Buttons based on current status -->
+                            <form th:action="@{/member/plans/updateStatus}" method="post">
+                                <input type="hidden" name="assignmentId" th:value="${assign.assignmentId}" />
+                                
+                                <div th:if="${assign.status == 'Active'}">
+                                    <button type="submit" name="status" value="Completed" class="btn btn-success btn-sm rounded-pill shadow-sm">
+                                        <i class="fas fa-check me-1"></i> Mark Completed
+                                    </button>
+                                    <button type="submit" name="status" value="Dropped" class="btn btn-outline-danger btn-sm rounded-pill ms-1">
+                                        Drop
+                                    </button>
+                                </div>
+                                
+                                <div th:if="${assign.status == 'Completed'}">
+                                    <button disabled class="btn btn-light btn-sm text-success border-0 fw-bold">
+                                        <i class="fas fa-trophy me-1"></i> Great Job!
+                                    </button>
+                                </div>
+                                
+                                 <div th:if="${assign.status == 'Dropped'}">
+                                    <button type="submit" name="status" value="Active" class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <i class="fas fa-redo me-1"></i> Restart Plan
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(assignments)}" class="col-12 text-center py-5">
+                <i class="fas fa-dumbbell fa-3x text-light mb-3" style="color: #e9ecef !important;"></i>
+                <p class="lead text-muted">No plans assigned to you yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -9,7 +9,7 @@
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-
+        
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
@@ -17,11 +17,11 @@
             display: flex;
             flex-direction: column;
         }
-
+        
         body > .container {
             flex: 1 0 auto;
         }
-
+        
         .navbar {
             background: var(--primary-gradient) !important;
             backdrop-filter: blur(10px);
@@ -29,19 +29,19 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.18);
             padding: 1.25rem 0;
         }
-
+        
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
             letter-spacing: -0.5px;
         }
-
+        
         .nav-link {
             font-weight: 500;
             transition: all 0.3s ease;
             position: relative;
         }
-
+        
         .nav-link::after {
             content: '';
             position: absolute;
@@ -53,7 +53,7 @@
             background: white;
             transition: transform 0.3s ease;
         }
-
+        
         .nav-link:hover::after {
             transform: translateX(-50%) scaleX(1);
         }
@@ -74,8 +74,13 @@
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/trainer/plans}"><i class="fas fa-dumbbell me-1"></i> Plans</a>
                     </li>
+                    <!-- Progress Link Added -->
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/trainer/members}"><i class="fas fa-users me-1"></i> Members</a>
+                        <a class="nav-link" th:href="@{/trainer/members/progress}"><i class="fas fa-chart-line me-1"></i> Progress</a>
+                    </li>
+                    <!-- Sessions Link Added -->
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/trainer/sessions/list}"><i class="fas fa-calendar-check me-1"></i> Sessions</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/auth/logout}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
