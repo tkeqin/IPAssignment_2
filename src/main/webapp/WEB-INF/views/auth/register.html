@@ -18,30 +18,19 @@
     <form th:action="@{/auth/register/save}" th:object="${member}" method="post">
 
         <label>Username:</label>
-        <input type="text" th:field="*{username}"/>
+        <input type="text" th:field="*{username}" required />
         
         <label>Password:</label>
-        <input type="password" th:field="*{password}"/>
+        <input type="password" th:field="*{password}" required />
         
-        <label>Name:</label>
-        <input type="text" th:field="*{name}"/>
+        <label>Full Name:</label>
+        <input type="text" th:field="*{fullName}" required />
         
         <label>Email:</label>
-        <input type="email" th:field="*{email}"/>
-        
-        <label>Phone:</label>
-        <input type="text" th:field="*{phoneNumber}"/>
-        
-        <label>Gender:</label>
-        <select th:field="*{gender}">
-            <option value="">Select</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-        </select>
-  
-        <input type="hidden" th:field="*{role}"/>
-        <input type="hidden" th:field="*{memberId}"/>
+        <input type="email" th:field="*{email}" />
+
+        <input type="hidden" th:field="*{role}" />
+        <input type="hidden" th:field="*{personId}" />
         
         <button type="submit">Register</button>
         <p><a th:href="@{/auth/login}">Already have account? Login</a></p>

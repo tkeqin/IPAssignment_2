@@ -1,120 +1,126 @@
-package com.secj3303.controller;
+/*package com.secj3303.controller;
 
-import java.util.List;
-
+import com.secj3303.dao.CategoryDao;
+import com.secj3303.dao.ProgramDao;
+import com.secj3303.model.Program;
+import com.secj3303.model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import com.secj3303.dao.MemberDao;
-import com.secj3303.model.Member;
+import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final MemberDao personDao;
-
-    /**
-     * Dependency Injection (DI) via Constructor:
-     * Spring automatically injects the bean implementing the PersonDao interface
-     * (which is PersonDaoJdbc, provided in the DAO package).
-     */
     @Autowired
-    public AdminController(MemberDao personDao) {
-        this.personDao = personDao;
+    private ProgramDao programDao; // DAO for Program CRUD
+    
+    @Autowired
+    private CategoryDao categoryDao; // DAO for populating category dropdowns
+
+    // Helper method for manual role check
+    private boolean checkRole(HttpSession session, String expectedRole) {
+        // Check if the role attribute exists and matches "admin"
+        String currentRole = (String) session.getAttribute("role");
+        return expectedRole.equals(currentRole);
     }
 
-    @RequestMapping("/dashboard")
-    public String dashboard(Model model) {
-        List<Member> people = personDao.findAll();
-        model.addAttribute("people", people);
-        return "person-list";
+    
+     //Admin Dashboard
+    
+    @GetMapping("/dashboard")
+    public String adminDashboard(HttpSession session) {
+        if (!checkRole(session, "admin")) {
+            return "redirect:/login"; // Redirect if not an Admin
+        }
+        // If role is correct, return the dashboard view
+        return "admin-dashboard"; // Maps to admin-dashboard.html
     }
 
-    /**
-     * Handles requests to the /person/list URL.
-     * 1. Uses the injected DAO to fetch data.
-     * 2. Adds the data to the Model for Thymeleaf consumption.
-     * * @param model The Spring Model object.
-     * @return The logical view name ("person-list").
-     */
-    @RequestMapping("/person/list")
-    public String listPeople(Model model) {
+    // =============================================================
+    // PROGRAM MANAGEMENT (CRUD)
+    // =============================================================
+    
+   // Displays a list of all programs (Read All)
+    
+    @GetMapping("/programs")
+    public String listPrograms(HttpSession session, Model model) {
+        if (!checkRole(session, "admin")) {
+            return "redirect:/login"; 
+        }
+
+        List<Program> programs = programDao.findAll();
+        model.addAttribute("programList", programs);
         
-        // Fetch all Person records using the injected DAO
-        List<Member> people = personDao.findAll();
+        return "admin-program-list"; // Maps to admin-program-list.html
+    }
+
+    //Displays the form for adding a new program (Create/Update Form)
+     
+    @GetMapping("/programs/form")
+    public String showProgramForm(HttpSession session, Model model, 
+                                  @RequestParam(required = false) Integer programId) {
+        if (!checkRole(session, "admin")) {
+            return "redirect:/login";
+        }
         
-        // Add the list to the model under the attribute name "people"
-        // This links to the variable used in person-list.html: ${people}
-        model.addAttribute("people", people);
+        Program program;
+        if (programId != null) {
+            // Edit existing program
+            program = programDao.findById(programId);
+        } else {
+            // New program
+            program = new Program();
+        }
+
+        List<Category> categories = categoryDao.findAll(); // Used for dropdown
         
-        // Return the view name (person-list.html)
-        return "person-list"; 
+        model.addAttribute("program", program);
+        model.addAttribute("categories", categories);
+        
+        return "admin-program-form"; // Maps to admin-program-form.html
+    }
+    
+    //Handles the submission of the program form (Create/Update logic)
+    
+    @PostMapping("/programs/save")
+    public String saveProgram(HttpSession session, @ModelAttribute("program") Program program) {
+        if (!checkRole(session, "admin")) {
+            return "redirect:/login";
+        }
+        
+        // The DAO handles both save (new) and update (existing)
+        programDao.save(program);
+
+        // Redirect to the list view
+        return "redirect:/admin/programs";
     }
 
-    @RequestMapping("/person/search")
-    public String searchById(@RequestParam(value = "id", required = false) Integer id, Model model) {
-        // If no id parameter provided, show the search page so user can enter an ID.
-        if (id == null) {
-            return "person-findbyid"; // show the form that asks for an id
+    //Deletes a program (Delete)
+     
+    @GetMapping("/programs/delete")
+    public String deleteProgram(HttpSession session, @RequestParam("programId") int programId) {
+        if (!checkRole(session, "admin")) {
+            return "redirect:/login";
         }
 
-        Member person = personDao.findById(id);
-        if (person != null) {
-            model.addAttribute("person", person);
-        } else {
-            model.addAttribute("error", "Person not found with ID " + id);
-        }
-        return "person-view"; // Display person details or an error message
+        // ProgramDao should have a delete method that takes ID or Entity
+        programDao.deleteById(programId); 
+
+        return "redirect:/admin/programs";
     }
 
-    // This method simply displays the person-findbyid.html page
-    @RequestMapping("/person/find")
-    public String showSearchPage() {
-        return "person-findbyid"; // Matches the HTML filename
-    }
-
-
-    @RequestMapping("/person/form")
-    public String showForm(@RequestParam(value = "id", required = false) Integer id, Model model) {
-        if (id != null) {
-            Member person = personDao.findById(id);
-            if (person != null) {
-                model.addAttribute("person", person);
-            } else {
-                model.addAttribute("error", "Person not found with ID " + id);
-            }
-        } else {
-            model.addAttribute("person", new Member()); // Create a new person if no ID is provided
-        }
-        return "person-form"; // The form page for adding or editing a person
-    }
-
-    @RequestMapping("/person/save")
-    public String savePerson(Member person) {
-        if (person.getMemberId() == 0) {
-            // If there's no ID, it's a new person (insert operation)
-            personDao.insert(person);
-        } else {
-            // If there's an ID, it's an update operation
-            personDao.update(person);
-        }
-        return "redirect:/person/list"; // Redirect back to the list after saving
-    }
-
-    @RequestMapping("/person/godelete")
-    public String godeleteById() {
-
-        return "person-delete"; // Redirect back to the list after deletion
-    }
-
-    @RequestMapping("/person/delete")
-    public String deleteById(@RequestParam(value = "id", required = false) Integer id) {
-        personDao.delete(id);
-        return "redirect:/person/list"; // Redirect back to the list after deletion
-    }
-
-}
+    // =============================================================
+    // CATEGORY MANAGEMENT (Similar CRUD structure required here)
+    // =============================================================
+    
+    // TODO: Implement GET mapping for /admin/categories
+    // TODO: Implement GET mapping for /admin/categories/form
+    // TODO: Implement POST mapping for /admin/categories/save
+    // TODO: Implement GET mapping for /admin/categories/delete
+    
+} */
