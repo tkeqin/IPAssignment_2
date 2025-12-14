@@ -231,6 +231,24 @@
         .floating {
             animation: float 3s ease-in-out infinite;
         }
+
+        .plan-card::before {
+            background: var(--warning-gradient);
+        }
+
+        .plan-card .module-icon {
+            background: linear-gradient(
+                135deg,
+                rgba(79, 172, 254, 0.12) 0%,
+                rgba(0, 242, 254, 0.12) 100%
+            );
+            color: #4facfe;
+        }
+
+        .program-card::before {
+            background: var(--info-gradient);
+        }
+
     </style>
     </head>
 <body>
@@ -247,7 +265,7 @@
         </div>
 
         <div class="row g-4 mb-5">
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <div class="bmi-card">
                     <div class="d-flex align-items-center mb-3">
                         <div class="icon-success module-icon me-3" style="width: 60px; height: 60px; margin: 0;">
@@ -284,6 +302,50 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-lg-4">
+                <div class="bmi-card program-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-info module-icon me-3" style="width: 60px; height: 60px; margin: 0;">
+                            <i class="fas fa-compass"></i>
+                        </div>
+                        <h4 class="mb-0 fw-bold text-dark">Browse Programs</h4>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <p class="text-muted mb-4">
+                        Explore health and fitness programs designed to support your wellness goals.
+                    </p>
+
+                    <a th:href="@{/member/programs}" class="btn btn-gradient">
+                        <i class="fas fa-arrow-right me-2"></i>View Programs
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="bmi-card plan-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-warning module-icon me-3" style="width: 60px; height: 60px; margin: 0;">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h4 class="mb-0 fw-bold text-dark">Manage Plans</h4>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <p class="text-muted mb-4">
+                        View, update, and track your personalized health plans in one place.
+                    </p>
+
+                    <a th:href="@{/member/plans}" class="btn btn-gradient">
+                        <i class="fas fa-sliders-h me-2"></i>Manage Plans
+                    </a>
+                </div>
+            </div>
+
+
         </div>
 
         <h2 class="section-title">Your Health Modules</h2>
