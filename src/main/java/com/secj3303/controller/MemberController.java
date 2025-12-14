@@ -1,5 +1,6 @@
 package com.secj3303.controller;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,10 +19,14 @@ import com.secj3303.dao.BmiRecordDao;
 import com.secj3303.dao.PersonDao;
 import com.secj3303.dao.TrainerDao; 
 import com.secj3303.model.BmiRecord;
+import com.secj3303.model.Enrollment;
 import com.secj3303.model.Person;
 import com.secj3303.model.PlanAssignment; 
 import com.secj3303.dao.ProgramDao; 
 import com.secj3303.model.Program;
+import com.secj3303.model.FitnessPlan;
+import com.secj3303.dao.EnrollmentDao;
+
 
 @Controller
 @RequestMapping("/member")
@@ -38,6 +43,9 @@ public class MemberController {
 
     @Autowired
     private ProgramDao programDao;
+
+    @Autowired
+    private EnrollmentDao EnrollmentDao;
 
     // Helper method for manual role check
     private boolean checkRole(HttpSession session, String expectedRole) {
@@ -154,7 +162,7 @@ public class MemberController {
         return "redirect:/member/my-plans";
     }
 
-     @GetMapping("/programs")
+    @GetMapping("/programs")
     public String browsePrograms(HttpSession session, Model model) {
         if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
 
@@ -162,5 +170,53 @@ public class MemberController {
         model.addAttribute("programs", programs);
         return "member/browse-programs";
     }
+
+    @PostMapping("/programs/enroll")
+    public String enrollProgram(@RequestParam("programId") int programId,
+                                HttpSession session) {
+
+        System.out.println("Enroll programId = " + programId);
+
+        // 1. Role check
+        if (!checkRole(session, "member")) {
+            return "redirect:/auth/login";
+        }
+
+
+        // 2. Get current member
+        int memberId = (int) session.getAttribute("personId");
+        Person member = personDao.findById(memberId);
+
+        // 3. Get selected program
+        Program program = programDao.findById(programId);
+
+        if (member == null || program == null) {
+            // Optional: handle invalid input
+            return "redirect:/member/programs";
+        }
+
+        // 4. Check for existing enrollment to avoid duplicates
+        Enrollment existing = EnrollmentDao.findByMemberAndProgram(memberId, programId);
+
+        if (existing == null) {
+            // 5. Create new enrollment record
+            Enrollment enrollment = new Enrollment();
+            enrollment.setMember(member);
+            enrollment.setProgram(program);
+            enrollment.setEnrollDate(LocalDate.now()); // current date
+            enrollment.setStatus("ACTIVE");           // initial status
+
+            System.out.println("Member: " + member);
+            System.out.println("Program: " + program);
+
+
+            // 6. Save to database via DAO
+            EnrollmentDao.save(enrollment);
+        }
+
+        // 7. Redirect back to programs page
+        return "redirect:/member/programs";
+    }
+
     
 }

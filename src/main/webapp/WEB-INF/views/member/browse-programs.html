@@ -42,7 +42,7 @@
         }
 
         /* Program icon */
-       .program-icon {
+        .program-icon {
             width: 60px;
             height: 60px;
             border-radius: 50%;
@@ -51,9 +51,8 @@
             align-items: center;
             justify-content: center;
             color: #667eea;
-            margin: 0 auto 1rem auto; /* increased bottom margin for spacing */
+            margin: 0 auto 1rem auto;
         }
-
 
         /* Program title */
         .program-title {
@@ -106,6 +105,24 @@
             color: white;
             text-decoration: none;
         }
+
+        /* Cancel button style */
+        .btn-cancel {
+            background: #e63946;  /* red */
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(230, 57, 70, 0.4);
+            color: white;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -138,13 +155,33 @@
 
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div>
-                            <span class="info-badge badge-duration" th:text="${program.durationWeeks + ' wks'}">8 wks</span>
+                            <span class="info-badge badge-duration" th:text="${program.durationWeeks + ' weeks'}">8 weeks</span>
                             <span class="info-badge badge-fee" th:text="${'$' + program.monthlyFee}">$120</span>
                         </div>
-                        <a th:href="@{'/member/programs/enroll/' + ${program.id}}" class="btn-enroll">
-                            <i class="fas fa-arrow-right me-1"></i> Enroll
-                        </a>
-                    </div>
+
+                        <!-- Enroll / Cancel Button -->
+                        <div>
+                            <!-- Enroll button for CANCELLED or COMPLETED programs -->
+                            <form th:action="@{/member/programs/enroll}" method="post" class="d-inline"
+                                th:if="${program.status == 'CANCELLED' or program.status == 'COMPLETED'}">
+                                <input type="hidden" name="programId" th:value="${program.id}">
+                                <button type="submit" class="btn-enroll">
+                                    <i class="fas fa-arrow-right me-1"></i> Enroll
+                                </button>
+                            </form>
+
+                            <!-- Cancel button for ACTIVE programs -->
+                            <form th:action="@{/member/programs/cancel}" method="post" class="d-inline"
+                                th:if="${program.status == 'ACTIVE'}">
+                                <input type="hidden" name="programId" th:value="${program.id}">
+                                <button type="submit" class="btn-cancel">
+                                    <i class="fas fa-times me-1"></i> Cancel
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </div> 
                 </div>
             </div>
 
