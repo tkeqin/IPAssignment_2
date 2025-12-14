@@ -8,17 +8,17 @@
     <!-- Reuse your existing styles if available -->
     <style>
         .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; transition: all 0.3s ease; }
-    </style>
+    </style> 
 </head>
 <body class="bg-light">
     
     <!-- Include your navigation bar here (e.g., th:replace="fragments/header :: nav") -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/member/dashboard">HealthHub Member</a>
+            <a class="navbar-brand fw-bold" th:href="@{/member/dashboard}">HealthHub Member</a>
              <div class="ms-auto">
-                <a href="/member/dashboard" class="text-white me-3 text-decoration-none">Dashboard</a>
-                <a href="/auth/logout" class="btn btn-outline-light btn-sm">Logout</a>
+                <a th:href="@{/member/dashboard}" class="text-white me-3 text-decoration-none">Dashboard</a>
+                <a th:href="@{/auth/logout}" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
         </div>
     </nav>
@@ -26,7 +26,7 @@
     <div class="container py-4">
         
         <!-- Back Link -->
-        <a href="/member/dashboard" class="text-decoration-none text-muted mb-3 d-inline-block">
+        <a th:href="@{/member/dashboard}" class="text-decoration-none text-muted mb-3 d-inline-block">
             <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
         </a>
 

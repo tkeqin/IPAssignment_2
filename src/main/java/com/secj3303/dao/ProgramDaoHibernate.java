@@ -5,7 +5,6 @@ import com.secj3303.model.Program;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -18,35 +17,53 @@ public class ProgramDaoHibernate implements ProgramDao {
     @Autowired
     private SessionFactory sessionFactory;
 
+    /**
+     * Open a new Hibernate session (manual session management).
+     */
     private Session openSession() {
-        return sessionFactory.getCurrentSession();
+        return sessionFactory.openSession(); // use openSession() for pure Hibernate
     }
 
-    
     @Override
     public List<Program> findAll() {
-        // Implementation using Hibernate to fetch all Program records
         Session session = openSession();
-        List<Program> programs = session
-            .createQuery("from Program", Program.class)
-            .list();
+        Transaction tx = session.beginTransaction();
+        List<Program> programs;
 
-        session.close();
+        try {
+            programs = session.createQuery("from Program", Program.class).list();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
+
         return programs;
     }
 
     @Override
     public Program findById(Integer id) {
-        // Implementation using Hibernate to fetch a Program by its ID
         Session session = openSession();
-        Program program = session.get(Program.class, id);
-        session.close();
+        Transaction tx = session.beginTransaction();
+        Program program;
+
+        try {
+            program = session.get(Program.class, id);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
+
         return program;
     }
 
     @Override
     public void save(Program program) {
-        // Implementation using Hibernate to save a Person record
         Session session = openSession();
         Transaction tx = session.beginTransaction();
 
@@ -54,9 +71,7 @@ public class ProgramDaoHibernate implements ProgramDao {
             session.saveOrUpdate(program);
             tx.commit();
         } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
+            if (tx != null) tx.rollback();
             throw e;
         } finally {
             session.close();
@@ -65,28 +80,24 @@ public class ProgramDaoHibernate implements ProgramDao {
 
     @Override
     public int delete(Integer id) {
-        // Implementation using Hibernate to delete a Program by its ID
         Session session = openSession();
         Transaction tx = session.beginTransaction();
+
         try {
             Program program = session.get(Program.class, id);
             if (program != null) {
                 session.delete(program);
                 tx.commit();
-                return 1; // Indicate successful deletion
+                return 1; // deletion successful
             } else {
                 tx.rollback();
-                return 0; // Indicate no record found to delete
+                return 0; // no record found
             }
         } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
+            if (tx != null) tx.rollback();
             throw e;
         } finally {
             session.close();
         }
- 
     }
-    
 }
