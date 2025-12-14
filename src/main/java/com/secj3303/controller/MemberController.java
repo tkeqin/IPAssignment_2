@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.secj3303.dao.BmiRecordDao;
 import com.secj3303.dao.PersonDao;
-import com.secj3303.dao.TrainerDao; // Import the Trainer DAO
+import com.secj3303.dao.TrainerDao; 
 import com.secj3303.model.BmiRecord;
 import com.secj3303.model.Person;
-import com.secj3303.model.PlanAssignment; // Import PlanAssignment model
+import com.secj3303.model.PlanAssignment; 
+import com.secj3303.dao.ProgramDao; 
+import com.secj3303.model.Program;
 
 @Controller
 @RequestMapping("/member")
@@ -32,7 +34,10 @@ public class MemberController {
     private PersonDao personDao;
 
     @Autowired
-    private TrainerDao trainerDao; // Injected for Plan operations
+    private TrainerDao trainerDao; 
+
+    @Autowired
+    private ProgramDao programDao;
 
     // Helper method for manual role check
     private boolean checkRole(HttpSession session, String expectedRole) {
@@ -144,8 +149,18 @@ public class MemberController {
         if (assignment != null) {
             assignment.setStatus(status);
             trainerDao.saveAssignment(assignment);
-        }
+        } 
 
         return "redirect:/member/my-plans";
     }
+
+     @GetMapping("/programs")
+    public String browsePrograms(HttpSession session, Model model) {
+        if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
+
+        List <Program> programs = programDao.findAll();
+        model.addAttribute("programs", programs);
+        return "member/browse-programs";
+    }
+    
 }
