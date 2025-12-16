@@ -53,7 +53,7 @@ public class AdminController {
     public String listPrograms(HttpSession session, Model model) {
         // Use the helper method for checking
         if (!checkRole(session, ADMIN_ROLE)) {
-            return "redirect:/login"; // Redirect if not admin
+            return "redirect:/auth/login"; // Redirect if not admin
         }
         
         List<Program> programs = programDao.findAll();
@@ -88,9 +88,9 @@ public class AdminController {
     @PostMapping("/saveProgram")
     public String saveProgram(HttpSession session, @ModelAttribute("program") Program program) {
         if (!checkRole(session, ADMIN_ROLE)) {
-            return "redirect:/login"; // Redirect if not admin
+            return "redirect:/auth/login"; // Redirect if not admin
         }
-        
+
         // programDao.save() handles both INSERT (new program) and UPDATE (existing program)
         programDao.save(program); 
         
@@ -103,7 +103,7 @@ public class AdminController {
     public String deleteProgram(HttpSession session, @RequestParam("programId") Integer id) {
         // Use the helper method for checking
         if (!checkRole(session, ADMIN_ROLE)) {
-            return "redirect:/login"; // Redirect if not admin
+            return "redirect:/auth/login"; // Redirect if not admin
         }
         
         programDao.delete(id); 
