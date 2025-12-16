@@ -51,7 +51,17 @@ public class AdminController {
 
         String fullName = (String) session.getAttribute("fullName");
         
+        // Fetch actual statistics from database
+        List<Program> programs = programDao.findAll();
+        List<Category> categories = categoryDao.findAll();
+        List<Person> members = personDao.findByRole("member");
+        List<Person> trainers = personDao.findByRole("trainer");
+        
         model.addAttribute("adminName", fullName);
+        model.addAttribute("totalPrograms", programs != null ? programs.size() : 0);
+        model.addAttribute("totalCategories", categories != null ? categories.size() : 0);
+        model.addAttribute("totalMembers", members != null ? members.size() : 0);
+        model.addAttribute("totalTrainers", trainers != null ? trainers.size() : 0);
 
         return "admin/admin-dashboard"; 
     }

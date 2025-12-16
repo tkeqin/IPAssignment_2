@@ -44,22 +44,9 @@
 
   <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
   <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
-  <property name="url" value="jdbc:mysql://localhost:3307/healthhubutm?useSSL=false&amp;serverTimezone=UTC" />
+  <property name="url" value="jdbc:mysql://localhost:3306/healthhubutm?useSSL=false&amp;serverTimezone=UTC" />
   <property name="username" value="root" /> 
   <property name="password" value="" />
-  </bean>
-
-  <!-- DataSource for database initialization (connects to MySQL root, no specific DB) -->
-  <bean id="initDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
-    <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
-    <property name="url" value="jdbc:mysql://localhost:3307/?useSSL=false&amp;serverTimezone=UTC&amp;allowMultiQueries=true" />
-    <property name="username" value="root" /> 
-    <property name="password" value="" />
-  </bean>
-
-  <!-- Database creator bean to initialize database before Hibernate -->
-  <bean id="databaseInitializer" class="com.secj3303.util.DatabaseInitializer" init-method="initialize">
-    <property name="dataSource" ref="initDataSource" />
   </bean>
 
   <!--<bean id="personDaoJdbc" class="com.secj3303.dao.PersonDaoJdbc">

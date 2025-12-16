@@ -268,63 +268,6 @@
             margin-bottom: 0;
         }
         
-        .quick-stats {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            margin-bottom: 2rem;
-        }
-        
-        .quick-stats h4 {
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-        }
-        
-        .quick-stats h4 i {
-            margin-right: 0.75rem;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            color: #667eea;
-        }
-        
-        .quick-stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background: #f7fafc;
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
-            transition: all 0.3s ease;
-        }
-        
-        .quick-stat-item:hover {
-            background: #edf2f7;
-            transform: translateX(5px);
-        }
-        
-        .quick-stat-label {
-            font-weight: 600;
-            color: #4a5568;
-        }
-        
-        .quick-stat-value {
-            font-weight: 700;
-            color: #2d3748;
-            font-size: 1.1rem;
-        }
-        
-        /* Footer styles moved to admin/footer fragment */
-        
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
@@ -375,122 +318,47 @@
         <div class="stats-grid animate-in stagger-1">
             <div class="stat-card primary">
                 <div class="stat-icon icon-primary">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-dumbbell"></i>
                 </div>
-                <div class="stat-value" th:text="${totalUsers != null ? totalUsers : 0}">156</div>
-                <div class="stat-label">Total Users</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i>+12% this month
-                </div>
+                <div class="stat-value" th:text="${totalPrograms != null ? totalPrograms : 0}">0</div>
+                <div class="stat-label">Total Programs</div>
             </div>
             
             <div class="stat-card success">
                 <div class="stat-icon icon-success">
-                    <i class="fas fa-dumbbell"></i>
+                    <i class="fas fa-tags"></i>
                 </div>
-                <div class="stat-value" th:text="${totalPrograms != null ? totalPrograms : 0}">42</div>
-                <div class="stat-label">Active Programs</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i>+8% this month
-                </div>
+                <div class="stat-value" th:text="${totalCategories != null ? totalCategories : 0}">0</div>
+                <div class="stat-label">Categories</div>
             </div>
             
             <div class="stat-card info">
                 <div class="stat-icon icon-info">
-                    <i class="fas fa-tags"></i>
+                    <i class="fas fa-user-friends"></i>
                 </div>
-                <div class="stat-value" th:text="${totalCategories != null ? totalCategories : 0}">15</div>
-                <div class="stat-label">Categories</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-minus me-1"></i>No change
-                </div>
+                <div class="stat-value" th:text="${totalMembers != null ? totalMembers : 0}">0</div>
+                <div class="stat-label">Members</div>
             </div>
             
             <div class="stat-card warning">
                 <div class="stat-icon icon-warning">
-                    <i class="fas fa-chart-line"></i>
+                    <i class="fas fa-user-tie"></i>
                 </div>
-                <div class="stat-value" th:text="${enrollmentRate != null ? enrollmentRate + '%' : '78%'}">78%</div>
-                <div class="stat-label">Enrollment Rate</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i>+5% this month
-                </div>
-            </div>
-            
-            <div class="stat-card danger">
-                <div class="stat-icon icon-danger">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="stat-value" th:text="${totalSessions != null ? totalSessions : 0}">89</div>
-                <div class="stat-label">Total Sessions</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up me-1"></i>+15% this month
-                </div>
+                <div class="stat-value" th:text="${totalTrainers != null ? totalTrainers : 0}">0</div>
+                <div class="stat-label">Trainers</div>
             </div>
         </div>
 
-        <div class="row mb-4 animate-in stagger-2">
-            <div class="col-lg-6">
-                <div class="quick-stats">
-                    <h4>
-                        <i class="fas fa-bolt"></i>
-                        Quick Statistics
-                    </h4>
-                    <div class="quick-stat-item">
-                        <span class="quick-stat-label">Trainers Active</span>
-                        <span class="quick-stat-value" th:text="${activeTrainers != null ? activeTrainers : 0}">8</span>
-                    </div>
-                    <div class="quick-stat-item">
-                        <span class="quick-stat-label">Members Active</span>
-                        <span class="quick-stat-value" th:text="${activeMembers != null ? activeMembers : 0}">142</span>
-                    </div>
-                    <div class="quick-stat-item">
-                        <span class="quick-stat-label">Pending Approvals</span>
-                        <span class="quick-stat-value" th:text="${pendingApprovals != null ? pendingApprovals : 0}">3</span>
-                    </div>
-                    <div class="quick-stat-item">
-                        <span class="quick-stat-label">Completed Programs</span>
-                        <span class="quick-stat-value" th:text="${completedPrograms != null ? completedPrograms : 0}">127</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-6">
-                <div class="quick-stats">
-                    <h4>
-                        <i class="fas fa-clock"></i>
-                        Recent Activity
-                    </h4>
-                    <div class="quick-stat-item">
-                        <span class="quick-stat-label">New Users Today</span>
-                        <span class="quick-stat-value" th:text="${newUsersToday != null ? newUsersToday : 0}">4</span>
-                    </div>
-                    <div class="quick-stat-item">
-                        <span class="quick-stat-label">Programs Created Today</span>
-                        <span class="quick-stat-value" th:text="${programsCreatedToday != null ? programsCreatedToday : 0}">2</span>
-                    </div>
-                    <div class="quick-stat-item">
-                        <span class="quick-stat-label">Sessions Scheduled</span>
-                        <span class="quick-stat-value" th:text="${sessionsScheduledToday != null ? sessionsScheduledToday : 0}">6</span>
-                    </div>
-                    <div class="quick-stat-item">
-                        <span class="quick-stat-label">System Uptime</span>
-                        <span class="quick-stat-value">99.9%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <h2 class="section-title animate-in stagger-3">Management Tools</h2>
+        <h2 class="section-title animate-in stagger-2">Management Tools</h2>
         
-        <div class="row g-4 animate-in stagger-4">
+        <div class="row g-4 animate-in stagger-3">
             <div class="col-lg-4 col-md-6">
                 <a th:href="@{/admin/programs}" class="module-card">
                     <div class="module-icon icon-primary">
-                        <i class="fas fa-folder-open"></i>
+                        <i class="fas fa-dumbbell"></i>
                     </div>
                     <h5>Manage Programs</h5>
-                    <p>Create, edit, update and delete fitness programs and challenges</p>
+                    <p>Create, edit, update and delete fitness programs</p>
                 </a>
             </div>
             
@@ -500,31 +368,19 @@
                         <i class="fas fa-layer-group"></i>
                     </div>
                     <h5>Manage Categories</h5>
-                    <p>Organize programs by creating and managing category structures</p>
+                    <p>Organize programs by creating and managing categories</p>
                 </a>
             </div>
             
             <div class="col-lg-4 col-md-6">
                 <a th:href="@{/admin/reports}" class="module-card">
                     <div class="module-icon icon-info">
-                        <i class="fas fa-file-chart-line"></i>
+                        <i class="fas fa-chart-bar"></i>
                     </div>
                     <h5>System Reports</h5>
-                    <p>View comprehensive analytics and generate detailed reports</p>
+                    <p>View system statistics and generate reports</p>
                 </a>
             </div>
-            
-            <div class="col-lg-4 col-md-6">
-                <a th:href="@{/admin/users}" class="module-card">
-                    <div class="module-icon icon-warning">
-                        <i class="fas fa-users-cog"></i>
-                    </div>
-                    <h5>User Management</h5>
-                    <p>Manage user accounts, roles, and permissions</p>
-                </a>
-            </div>
-            
-
         </div>
         
     </div>
