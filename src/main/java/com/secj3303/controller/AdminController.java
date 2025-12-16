@@ -15,16 +15,20 @@ public class AdminController {
     // @Autowired
  
 
-    // Helper method for manual role check
+    // --- Helper for Security - Manual Role Check ---
     private boolean checkRole(HttpSession session, String expectedRole) {
+        if (session == null || expectedRole == null) {
+            return false;
+        }
         String currentRole = (String) session.getAttribute("role");
         return expectedRole.equals(currentRole);
     }
 
     @GetMapping("/dashboard")
     public String adminDashboard(HttpSession session, Model model) {
+        // Manual role check - ensure user is admin
         if (!checkRole(session, "admin")) {
-            return "auth/login"; // Redirect if not an Admin
+            return "redirect:/auth/login"; // Redirect if not an Admin
         }
 
         String fullName = (String) session.getAttribute("fullName");

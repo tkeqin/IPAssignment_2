@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.secj3303.dao.BmiRecordDao;
 import com.secj3303.dao.PersonDao;
-import com.secj3303.dao.TrainerDao; 
+import com.secj3303.dao.ProgramDao; 
+import com.secj3303.dao.TrainerDao;
 import com.secj3303.model.BmiRecord;
 import com.secj3303.model.Enrollment;
 import com.secj3303.model.Person;
 import com.secj3303.model.PlanAssignment; 
-import com.secj3303.dao.ProgramDao; 
 import com.secj3303.model.Program;
 import com.secj3303.model.FitnessPlan;
 import com.secj3303.dao.EnrollmentDao;
@@ -51,11 +51,16 @@ public class MemberController {
 
     // Helper method for manual role check
     private boolean checkRole(HttpSession session, String expectedRole) {
-        return expectedRole.equals(session.getAttribute("role"));
+        if (session == null || expectedRole == null) {
+            return false;
+        }
+        String currentRole = (String) session.getAttribute("role");
+        return expectedRole.equals(currentRole);
     }
 
     @GetMapping("/dashboard")
     public String memberDashboard(HttpSession session, Model model) {
+        // Manual role check - ensure user is member
         if (!checkRole(session, "member")) {
             return "redirect:/auth/login"; 
         }
@@ -77,6 +82,7 @@ public class MemberController {
 
     @GetMapping("/bmi")
     public String showBmiForm(HttpSession session, Model model) {
+        // Manual role check - ensure user is member
         if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
 
         int memberId = (int) session.getAttribute("personId");
@@ -92,6 +98,7 @@ public class MemberController {
 
     @PostMapping("/bmi/calculate")
     public String calculateAndSaveBmi(@ModelAttribute("bmiRecord") BmiRecord newRecord, HttpSession session) {
+        // Manual role check - ensure user is member
         if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
         
         int memberId = (int) session.getAttribute("personId");
@@ -117,6 +124,7 @@ public class MemberController {
 
     @GetMapping("/bmi/history")
     public String showBmiHistory(HttpSession session, Model model) {
+        // Manual role check - ensure user is member
         if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
         
         int memberId = (int) session.getAttribute("personId");
@@ -132,6 +140,7 @@ public class MemberController {
     // 1. Member's My Plans Page
     @GetMapping("/my-plans")
     public String viewMyPlans(HttpSession session, Model model) {
+        // Manual role check - ensure user is member
         if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
 
         int memberId = (int) session.getAttribute("personId");
@@ -148,6 +157,7 @@ public class MemberController {
     public String updatePlanStatus(@RequestParam("assignmentId") int assignmentId,
                                    @RequestParam("status") String status,
                                    HttpSession session) {
+        // Manual role check - ensure user is member
         if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
 
         int memberId = (int) session.getAttribute("personId");

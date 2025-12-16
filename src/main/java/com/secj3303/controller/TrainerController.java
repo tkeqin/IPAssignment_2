@@ -9,12 +9,20 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping; // Import the existing DAO
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.secj3303.dao.BmiRecordDao;
 import com.secj3303.dao.PersonDao;
 import com.secj3303.dao.TrainerDao;
-import com.secj3303.dao.BmiRecordDao; // Import the existing DAO
-import com.secj3303.model.*;
+import com.secj3303.model.BmiRecord;
+import com.secj3303.model.FitnessPlan;
+import com.secj3303.model.Person;
+import com.secj3303.model.PlanAssignment;
+import com.secj3303.model.TrainingSession;
 
 @Controller
 @RequestMapping("/trainer")
@@ -29,10 +37,14 @@ public class TrainerController {
     @Autowired
     private BmiRecordDao bmiRecordDao; // Inject the existing DAO
 
-    // --- Helper for Security ---
+    // --- Helper for Security - Manual Role Check ---
+    private boolean checkRole(HttpSession session, String expectedRole) {
+        String currentRole = (String) session.getAttribute("role");
+        return expectedRole != null && expectedRole.equals(currentRole);
+    }
+    
     private boolean isTrainer(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        return "trainer".equals(role);
+        return checkRole(session, "trainer");
     }
     
     private Person getSessionPerson(HttpSession session) {
@@ -44,6 +56,7 @@ public class TrainerController {
     // --- 1. Dashboard ---
     @GetMapping("/dashboard")
     public String trainerDashboard(HttpSession session, Model model) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
 
         int trainerId = (int) session.getAttribute("personId");
@@ -70,6 +83,7 @@ public class TrainerController {
     // --- 2. Create Fitness Plan ---
     @GetMapping("/plans")
     public String listPlans(HttpSession session, Model model) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
         model.addAttribute("plans", trainerDao.findAllPlans());
         return "trainer/plan-list";
@@ -77,6 +91,7 @@ public class TrainerController {
 
     @GetMapping("/plans/create")
     public String showCreatePlanForm(HttpSession session, Model model) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
         model.addAttribute("plan", new FitnessPlan());
         return "trainer/plan-form";
@@ -84,6 +99,7 @@ public class TrainerController {
 
     @PostMapping("/plans/save")
     public String savePlan(@ModelAttribute("plan") FitnessPlan plan, HttpSession session) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
         trainerDao.savePlan(plan);
         return "redirect:/trainer/plans";
@@ -96,6 +112,7 @@ public class TrainerController {
             HttpSession session, 
             Model model) {
         
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
         
         model.addAttribute("assignment", new PlanAssignment());
@@ -117,6 +134,7 @@ public class TrainerController {
                                  @RequestParam("memberId") int memberId,
                                  @RequestParam("planId") int planId,
                                  HttpSession session) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
 
         Person trainer = getSessionPerson(session);
@@ -136,6 +154,7 @@ public class TrainerController {
     // --- 4. Monitor Member Progress ---
     @GetMapping("/members/progress")
     public String monitorProgress(HttpSession session, Model model) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
         
         int trainerId = (int) session.getAttribute("personId");
@@ -150,6 +169,7 @@ public class TrainerController {
     // --- 4b. View Member Details ---
     @GetMapping("/members/progress/details")
     public String viewMemberDetails(@RequestParam("memberId") int memberId, HttpSession session, Model model) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
         
         Person member = personDao.findById(memberId);
@@ -166,6 +186,7 @@ public class TrainerController {
     // --- 5. Schedule Sessions ---
     @GetMapping("/sessions/schedule")
     public String showScheduleForm(HttpSession session, Model model) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
         model.addAttribute("session", new TrainingSession());
         return "trainer/session-form";
@@ -177,6 +198,7 @@ public class TrainerController {
                               @RequestParam("startTimeInput") String startStr,
                               @RequestParam("endTimeInput") String endStr,
                               HttpSession session) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
 
         Person trainer = getSessionPerson(session);
@@ -196,6 +218,7 @@ public class TrainerController {
     // --- Mark Session Complete ---
     @PostMapping("/sessions/complete")
     public String completeSession(@RequestParam("sessionId") int sessionId, HttpSession session) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
 
         TrainingSession trainingSession = trainerDao.findSessionById(sessionId);
@@ -212,6 +235,7 @@ public class TrainerController {
 
     @GetMapping("/sessions/list")
     public String listSessions(HttpSession session, Model model) {
+        // Manual role check - ensure user is trainer
         if (!isTrainer(session)) return "redirect:/auth/login";
         
         int trainerId = (int) session.getAttribute("personId");
