@@ -11,6 +11,9 @@ public class FitnessPlan {
     @Column(name = "plan_id")
     private int planId;
 
+    @Column(name = "program_id")
+    private int programId;
+
     @Column(name = "plan_name", nullable = false)
     private String planName; // e.g., "Weight Loss - Beginner"
 
@@ -26,9 +29,10 @@ public class FitnessPlan {
     // Constructors
     public FitnessPlan() {}
 
-    public FitnessPlan(String planName, String description, String difficultyLevel, int durationWeeks) {
+    public FitnessPlan(String planName, String description, int program_id, String difficultyLevel, int durationWeeks) {
         this.planName = planName;
         this.description = description;
+        this.programId = program_id;
         this.difficultyLevel = difficultyLevel;
         this.durationWeeks = durationWeeks;
     }
@@ -42,6 +46,9 @@ public class FitnessPlan {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public int getProgramId() { return programId; }
+    public void setProgramId(int programId) { this.programId = programId; }
 
     public String getDifficultyLevel() { return difficultyLevel; }
     public void setDifficultyLevel(String difficultyLevel) { this.difficultyLevel = difficultyLevel; }
