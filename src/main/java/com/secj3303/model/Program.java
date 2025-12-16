@@ -32,11 +32,11 @@ public class Program {
 
     // Getters and Setters
     public Integer getId() {
-        return id;
+        return programId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setId(Integer programId) {
+        this.programId = programId;
     }
 
     public String getName() {
