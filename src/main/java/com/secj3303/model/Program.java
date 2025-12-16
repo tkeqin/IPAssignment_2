@@ -13,7 +13,8 @@ public class Program {
 
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "program_id") //changed the attribute name from 'id' to 'program_id' to avoid confusion
+    private Integer programId;
 
     @Column(nullable = false, length = 100)
     private String name;

@@ -4,6 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;  // For @Transactional
+import java.util.Map;                                         // For Map
+import java.util.Objects;                                     // For Objects::nonNull
+import java.util.stream.Collectors;                           // For Collectors.toMap
+
 
 import javax.servlet.http.HttpSession;
 
@@ -180,23 +185,39 @@ public class MemberController {
             return "redirect:/auth/login";
         }
 
-        int memberId = (int) session.getAttribute("personId");
-        List<Program> allPrograms = programDao.findAll();
-        if (allPrograms == null) {
-            allPrograms = List.of();
-        }
+    Integer memberId = (Integer) session.getAttribute("personId");
+    if (memberId == null) return "redirect:/auth/login";
 
-        // Fetch all enrollments for this member to control buttons
-        List<Enrollment> memberEnrollments = enrollmentDao.findByMemberId(memberId);
-        java.util.Map<Integer, String> enrollmentStatusMap = memberEnrollments.stream()
+    List<Program> allPrograms = programDao.findAll();
+    if (allPrograms == null) allPrograms = List.of();
+
+    List<Enrollment> memberEnrollments = enrollmentDao.findByMemberId(memberId);
+    if (memberEnrollments == null) memberEnrollments = List.of();
+
+    // Map to show enrollment status for each program
+    Map<Integer, String> enrollmentStatusMap = memberEnrollments.stream()
             .filter(e -> e.getProgram() != null)
-            .collect(Collectors.toMap(e -> e.getProgram().getId(), Enrollment::getStatus));
+            .collect(Collectors.toMap(
+                    e -> e.getProgram().getId(),
+                    Enrollment::getStatus,
+                    (existing, replacement) -> existing
+            ));
 
-        model.addAttribute("programs", allPrograms);
-        model.addAttribute("enrollmentStatusMap", enrollmentStatusMap);
+    // Instead of filtering by ACTIVE, just show all programs the member is enrolled in
+    List<Program> myPrograms = memberEnrollments.stream()
+            .map(Enrollment::getProgram)
+            .filter(Objects::nonNull)
+            .toList();
 
-        return "member/browse-programs";
-    }
+    model.addAttribute("programs", allPrograms);
+    model.addAttribute("enrollmentStatusMap", enrollmentStatusMap);
+    model.addAttribute("myPrograms", myPrograms);
+
+    System.out.println("All Programs: " + allPrograms.size());
+    System.out.println("My Programs: " + myPrograms.size());
+
+    return "member/browse-programs";
+}
 
 
 

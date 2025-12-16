@@ -151,6 +151,49 @@
     </div>
 
     <!-- ================= My Programs ================= -->
+    <br>
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="fw-bold text-primary">My Programs</h2>
+            <p class="text-muted">Programs you are currently enrolled in.</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6" th:each="program : ${myPrograms}">
+            <div class="program-card">
+                <div class="text-center">
+                    <div class="program-icon">
+                        <i class="fas fa-dumbbell fa-2x"></i>
+                    </div>
+                    <h4 class="program-title" th:text="${program.name}"></h4>
+                </div>
+
+                <p class="program-desc" th:text="${program.description}"></p>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="info-badge badge-duration"
+                              th:text="${program.durationWeeks + ' weeks'}"></span>
+                        <span class="info-badge badge-fee"
+                              th:text="${'$' + program.monthlyFee}"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        
+                        <!-- Status Badge -->
+                        <span class="info-badge badge-status"
+                            th:text="${enrollmentStatusMap[program.id] != null ? enrollmentStatusMap[program.id] : 'Not Enrolled'}"
+                            th:classappend="${enrollmentStatusMap[program.id] == 'ACTIVE' ? ' bg-success text-white' : 
+                                            (enrollmentStatusMap[program.id] == 'CANCELLED' ? ' bg-warning text-dark' :
+                                            (enrollmentStatusMap[program.id] == 'COMPLETED' ? ' bg-primary text-white' : ' bg-secondary text-white'))}">
+                        </span>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- <div class="row mb-3" th:if="${#lists.isNotEmpty(myPrograms)}">
         <div class="col-12">
             <h2 class="fw-bold text-primary">My Programs</h2>

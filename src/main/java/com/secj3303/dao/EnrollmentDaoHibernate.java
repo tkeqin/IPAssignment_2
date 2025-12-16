@@ -66,10 +66,12 @@ public class EnrollmentDaoHibernate implements EnrollmentDao {
     public List<Enrollment> findByMemberId(int memberId) {
         return getCurrentSession()
                 .createQuery(
-                    "FROM Enrollment e WHERE e.member.id = :memberId",
+                    "SELECT e FROM Enrollment e JOIN FETCH e.program WHERE e.member.personId = :memberId",
                     Enrollment.class
                 )
                 .setParameter("memberId", memberId)
                 .list();
     }
+
+    
 }
