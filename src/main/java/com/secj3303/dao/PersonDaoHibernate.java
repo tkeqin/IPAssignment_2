@@ -58,4 +58,19 @@ public class PersonDaoHibernate implements PersonDao {
             return null;
         }
     }
+
+    /**
+     * Finds all persons with a specific role.
+     */
+    @Override
+    public List<Person> findByRole(String role) {
+        try {
+            return getCurrentSession().createQuery(
+                    "from Person p where p.role = :role", Person.class)
+                    .setParameter("role", role)
+                    .list();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

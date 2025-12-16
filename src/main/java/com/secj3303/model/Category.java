@@ -8,10 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="program")
-public class Program {
+@Table(name = "category")
+public class Category {
 
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -21,16 +21,13 @@ public class Program {
     @Column(length = 500)
     private String description;
 
-    @Column(length = 100)
-    private String category;
+    public Category() {
+    }
 
-    @Column(name="duration_weeks")
-    private int durationWeeks;
-
-    @Column(name="monthly_fee")
-    private Double monthlyFee;
-
-    public Program(){}
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     // Getters and Setters
     public Integer getId() {
@@ -57,27 +54,12 @@ public class Program {
         this.description = description;
     }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public int getDurationWeeks() {
-        return durationWeeks;
-    }
-
-    public void setDurationWeeks(int durationWeeks) {
-        this.durationWeeks = durationWeeks;
-    }
-
-    public Double getMonthlyFee() {
-        return monthlyFee;
-    }   
-
-    public void setMonthlyFee(Double monthlyFee) {
-        this.monthlyFee = monthlyFee;
+    @Override
+    public String toString() {
+        return "Category{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

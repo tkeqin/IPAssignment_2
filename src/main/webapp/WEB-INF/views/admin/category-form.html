@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Program Form - HealthHub@UTM</title>
+    <title>Add Category - HealthHub@UTM</title>
     <div th:replace="admin/header :: header-css"></div>
     <style>
         .page-header {
@@ -25,27 +25,7 @@
             font-size: 1rem;
         }
         
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-        
-        .breadcrumb a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-        
-        .breadcrumb span {
-            color: #94a3b8;
-        }
-        
+            
         .form-card {
             background: white;
             border-radius: 20px;
@@ -77,18 +57,8 @@
             padding: 2rem;
         }
         
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-        
         .form-group {
             margin-bottom: 1.75rem;
-        }
-        
-        .form-group.full-width {
-            grid-column: 1 / -1;
         }
         
         .form-group label {
@@ -180,20 +150,20 @@
             color: #475569;
         }
         
-        .error-state {
-            padding: 3rem;
-            text-align: center;
-        }
-        
-        .error-state i {
-            font-size: 3rem;
-            color: #ef4444;
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 1rem;
         }
         
-        .error-state p {
-            color: #64748b;
-            margin-bottom: 1.5rem;
+        .icon-box i {
+            font-size: 1.5rem;
+            color: #667eea;
         }
     </style>
 </head>
@@ -203,75 +173,47 @@
     <div class="container py-5">
                 
         <div class="page-header">
-            <h1 class="page-title" th:if="${program != null and program.id == null}">Add New Program</h1>
-            <h1 class="page-title" th:if="${program != null and program.id != null}">Edit Program</h1>
-            <h1 class="page-title" th:unless="${program != null}">Program Form</h1>
-            <p class="page-subtitle">Create and configure fitness programs for your members</p>
+            <h1 class="page-title" th:text="${category != null && category.id != null} ? 'Edit Category' : 'Add New Category'">Add New Category</h1>
+            <p class="page-subtitle">Create a new category to organize your fitness programs</p>
         </div>
         
         <div class="form-card">
             <div class="form-card-header">
                 <div class="form-card-title">
-                    <i class="fas fa-dumbbell"></i>
-                    Program Details
+                    <i class="fas fa-layer-group"></i>
+                    Category Details
                 </div>
             </div>
             
             <div class="form-card-body">
-                <form method="post" th:action="@{/admin/programs/save}" th:object="${program}" th:if="${program != null}">
-                    <input type="hidden" th:field="*{id}" />
+                <form th:action="@{/admin/categories/save}" method="post" th:object="${category}">
+                    <input type="hidden" th:field="*{id}" th:if="${category != null && category.id != null}"/>
                     
                     <div class="form-group">
-                        <label for="name">Program Name <span class="required">*</span></label>
-                        <input type="text" id="name" th:field="*{name}" class="form-control" required placeholder="e.g., Weight Loss Program">
-                        <p class="form-hint">Choose a clear, descriptive name for this program</p>
+                        <label for="name">Category Name <span class="required">*</span></label>
+                        <input type="text" id="name" name="name" class="form-control" 
+                               th:value="${category != null ? category.name : ''}" 
+                               placeholder="e.g., Strength Training, Cardio, Yoga..." required>
+                        <p class="form-hint">Choose a descriptive name for this category</p>
                     </div>
                     
                     <div class="form-group">
                         <label for="description">Description</label>
-                        <textarea id="description" th:field="*{description}" class="form-control" placeholder="Describe what this program offers, its goals, and what members can expect..."></textarea>
-                        <p class="form-hint">Provide details to help members understand this program</p>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="category">Category <span class="required">*</span></label>
-                            <input type="text" id="category" th:field="*{category}" class="form-control" required placeholder="e.g., Weight Loss, Muscle Gain">
-                            <p class="form-hint">Group similar programs together</p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="durationWeeks">Duration (Weeks) <span class="required">*</span></label>
-                            <input type="number" id="durationWeeks" th:field="*{durationWeeks}" class="form-control" required min="1" placeholder="12">
-                            <p class="form-hint">How long does this program last?</p>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="monthlyFee">Monthly Fee (RM) <span class="required">*</span></label>
-                            <input type="number" id="monthlyFee" th:field="*{monthlyFee}" class="form-control" required step="0.01" min="0" placeholder="99.99">
-                            <p class="form-hint">Set the monthly subscription fee</p>
-                        </div>
+                        <textarea id="description" name="description" class="form-control" 
+                                  placeholder="Describe what types of programs belong in this category..."
+                                  th:text="${category != null ? category.description : ''}"></textarea>
+                        <p class="form-hint">Help users understand what programs they'll find in this category</p>
                     </div>
                     
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Program
+                            <i class="fas fa-save"></i> Save Category
                         </button>
-                        <a th:href="@{/admin/programs}" class="btn btn-secondary">
+                        <a th:href="@{/admin/categories}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Cancel
                         </a>
                     </div>
                 </form>
-                
-                <div th:unless="${program != null}" class="error-state">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p>Error: Program object not found. Please contact administrator.</p>
-                    <a th:href="@{/admin/programs}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Programs
-                    </a>
-                </div>
             </div>
         </div>
     </div>

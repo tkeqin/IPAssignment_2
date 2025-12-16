@@ -14,4 +14,7 @@ public interface PersonDao {
     
     // Specific method for Login/Authentication
     Person findByUsernameAndPassword(String username, String password);
+    
+    // Find users by role
+    List<Person> findByRole(String role);
 }
