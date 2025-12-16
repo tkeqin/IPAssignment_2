@@ -48,7 +48,7 @@ public class MemberController {
     @Autowired
     private EnrollmentDao enrollmentDao;
 
-    // --- Helper for Security - Manual Role Check ---
+
     private boolean checkRole(HttpSession session, String expectedRole) {
         if (session == null || expectedRole == null) {
             return false;
@@ -175,7 +175,10 @@ public class MemberController {
 
     @GetMapping("/programs")
     public String browsePrograms(HttpSession session, Model model) {
-        if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
+
+        if (!checkRole(session, "member")) {
+            return "redirect:/auth/login";
+        }
 
         int memberId = (int) session.getAttribute("personId");
         List<Program> allPrograms = programDao.findAll();
