@@ -23,6 +23,8 @@ import com.secj3303.model.FitnessPlan;
 import com.secj3303.model.Person;
 import com.secj3303.model.PlanAssignment;
 import com.secj3303.model.TrainingSession;
+import com.secj3303.dao.EnrollmentDao;
+import com.secj3303.model.Enrollment;
 
 @Controller
 @RequestMapping("/trainer")
@@ -35,7 +37,9 @@ public class TrainerController {
     private PersonDao personDao;
     
     @Autowired
-    private BmiRecordDao bmiRecordDao; // Inject the existing DAO
+    private BmiRecordDao bmiRecordDao; 
+     @Autowired
+    private EnrollmentDao enrollmentDao; 
 
     // --- Helper for Security - Manual Role Check ---
     private boolean checkRole(HttpSession session, String expectedRole) {
@@ -120,10 +124,16 @@ public class TrainerController {
         model.addAttribute("plans", trainerDao.findAllPlans());     
         
         // --- NEW LOGIC: Fetch BMI History if a member is selected ---
-        if (selectedMemberId != null) {
+         if (selectedMemberId != null) {
             model.addAttribute("selectedMemberId", selectedMemberId);
+            
+            // 1. Fetch BMI History
             List<BmiRecord> history = bmiRecordDao.findByMemberId(selectedMemberId);
             model.addAttribute("bmiHistory", history);
+
+            // 2. Fetch Enrolled Programs (Requested Feature)
+            List<Enrollment> enrollments = enrollmentDao.findByMemberId(selectedMemberId);
+            model.addAttribute("enrollments", enrollments);
         }
         
         return "trainer/assign-plan";
