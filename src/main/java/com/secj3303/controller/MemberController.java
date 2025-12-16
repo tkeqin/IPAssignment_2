@@ -3,6 +3,7 @@ package com.secj3303.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -26,6 +27,7 @@ import com.secj3303.dao.ProgramDao;
 import com.secj3303.model.Program;
 import com.secj3303.model.FitnessPlan;
 import com.secj3303.dao.EnrollmentDao;
+ 
 
 
 @Controller
@@ -45,7 +47,7 @@ public class MemberController {
     private ProgramDao programDao;
 
     @Autowired
-    private EnrollmentDao EnrollmentDao;
+    private EnrollmentDao enrollmentDao;
 
     // Helper method for manual role check
     private boolean checkRole(HttpSession session, String expectedRole) {
@@ -164,12 +166,29 @@ public class MemberController {
 
     @GetMapping("/programs")
     public String browsePrograms(HttpSession session, Model model) {
-        if (!checkRole(session, "member")) { return "redirect:/auth/login"; }
+        if (!checkRole(session, "member")) {
+            return "redirect:/auth/login";
+        }
 
-        List <Program> programs = programDao.findAll();
-        model.addAttribute("programs", programs);
+        int memberId = (int) session.getAttribute("personId");
+        List<Program> allPrograms = programDao.findAll();
+        if (allPrograms == null) {
+            allPrograms = List.of();
+        }
+
+        // Fetch all enrollments for this member to control buttons
+        List<Enrollment> memberEnrollments = enrollmentDao.findByMemberId(memberId);
+        java.util.Map<Integer, String> enrollmentStatusMap = memberEnrollments.stream()
+            .filter(e -> e.getProgram() != null)
+            .collect(Collectors.toMap(e -> e.getProgram().getId(), Enrollment::getStatus));
+
+        model.addAttribute("programs", allPrograms);
+        model.addAttribute("enrollmentStatusMap", enrollmentStatusMap);
+
         return "member/browse-programs";
     }
+
+
 
     @PostMapping("/programs/enroll")
     public String enrollProgram(@RequestParam("programId") int programId,
@@ -177,46 +196,70 @@ public class MemberController {
 
         System.out.println("Enroll programId = " + programId);
 
-        // 1. Role check
         if (!checkRole(session, "member")) {
             return "redirect:/auth/login";
         }
 
-
-        // 2. Get current member
         int memberId = (int) session.getAttribute("personId");
         Person member = personDao.findById(memberId);
-
-        // 3. Get selected program
         Program program = programDao.findById(programId);
 
         if (member == null || program == null) {
-            // Optional: handle invalid input
             return "redirect:/member/programs";
         }
 
-        // 4. Check for existing enrollment to avoid duplicates
-        Enrollment existing = EnrollmentDao.findByMemberAndProgram(memberId, programId);
+        Enrollment existing = enrollmentDao.findByMemberAndProgram(memberId, programId);
 
         if (existing == null) {
-            // 5. Create new enrollment record
+            // No previous enrollment → create new
             Enrollment enrollment = new Enrollment();
             enrollment.setMember(member);
             enrollment.setProgram(program);
-            enrollment.setEnrollDate(LocalDate.now()); // current date
-            enrollment.setStatus("ACTIVE");           // initial status
-
-            System.out.println("Member: " + member);
-            System.out.println("Program: " + program);
-
-
-            // 6. Save to database via DAO
-            EnrollmentDao.save(enrollment);
+            enrollment.setEnrollDate(LocalDate.now());
+            enrollment.setStatus("ACTIVE");
+            enrollmentDao.save(enrollment);
+        } else if (!"ACTIVE".equals(existing.getStatus())) {
+            // Existing enrollment is CANCELLED or COMPLETED → reactivate
+            existing.setStatus("ACTIVE");
+            existing.setEnrollDate(LocalDate.now());
+            enrollmentDao.update(existing);
         }
 
-        // 7. Redirect back to programs page
+        System.out.println("Member: " + member);
+        System.out.println("Program: " + program);
+
         return "redirect:/member/programs";
     }
+
+    @PostMapping("/programs/cancel")
+    public String cancelProgram(@RequestParam("programId") int programId,
+                                HttpSession session) {
+
+        System.out.println("Cancel programId = " + programId);
+
+        if (!checkRole(session, "member")) {
+            return "redirect:/auth/login";
+        }
+
+        int memberId = (int) session.getAttribute("personId");
+        Person member = personDao.findById(memberId);
+        Program program = programDao.findById(programId);
+
+        if (member == null || program == null) {
+            return "redirect:/member/programs";
+        }
+
+        Enrollment existing = enrollmentDao.findByMemberAndProgram(memberId, programId);
+
+        if (existing != null && "ACTIVE".equals(existing.getStatus())) {
+            existing.setStatus("CANCELLED");
+            System.out.println("Member: " + member + " has cancelled Program: " + program);
+            enrollmentDao.update(existing);
+        }
+
+        return "redirect:/member/programs";
+    }
+
 
     
 }
