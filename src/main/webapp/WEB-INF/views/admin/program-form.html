@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Program Form - HealthHub@UTM</title>
+    <div th:replace="admin/header :: header-css"></div>
+    <style>
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb span {
+            color: #94a3b8;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .form-card-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .form-card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .form-card-title i {
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+        
+        .form-card-body {
+            padding: 2rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+        
+        .form-group label .required {
+            color: #ef4444;
+            margin-left: 0.25rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-control::placeholder {
+            color: #94a3b8;
+        }
+        
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+        }
+        
+        .form-hint {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            margin-top: 0.5rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        
+        .error-state {
+            padding: 3rem;
+            text-align: center;
+        }
+        
+        .error-state i {
+            font-size: 3rem;
+            color: #ef4444;
+            margin-bottom: 1rem;
+        }
+        
+        .error-state p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="admin/header :: header-nav"></div>
+
+    <div class="container py-5">
+                
+        <div class="page-header">
+            <h1 class="page-title" th:if="${program != null and program.id == null}">Add New Program</h1>
+            <h1 class="page-title" th:if="${program != null and program.id != null}">Edit Program</h1>
+            <h1 class="page-title" th:unless="${program != null}">Program Form</h1>
+            <p class="page-subtitle">Create and configure fitness programs for your members</p>
+        </div>
+        
+        <div class="form-card">
+            <div class="form-card-header">
+                <div class="form-card-title">
+                    <i class="fas fa-dumbbell"></i>
+                    Program Details
+                </div>
+            </div>
+            
+            <div class="form-card-body">
+                <form method="post" th:action="@{/admin/programs/save}" th:object="${program}" th:if="${program != null}">
+                    <input type="hidden" th:field="*{id}" />
+                    
+                    <div class="form-group">
+                        <label for="name">Program Name <span class="required">*</span></label>
+                        <input type="text" id="name" th:field="*{name}" class="form-control" required placeholder="e.g., Weight Loss Program">
+                        <p class="form-hint">Choose a clear, descriptive name for this program</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" th:field="*{description}" class="form-control" placeholder="Describe what this program offers, its goals, and what members can expect..."></textarea>
+                        <p class="form-hint">Provide details to help members understand this program</p>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Category <span class="required">*</span></label>
+                            <input type="text" id="category" th:field="*{category}" class="form-control" required placeholder="e.g., Weight Loss, Muscle Gain">
+                            <p class="form-hint">Group similar programs together</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="durationWeeks">Duration (Weeks) <span class="required">*</span></label>
+                            <input type="number" id="durationWeeks" th:field="*{durationWeeks}" class="form-control" required min="1" placeholder="12">
+                            <p class="form-hint">How long does this program last?</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="monthlyFee">Monthly Fee (RM) <span class="required">*</span></label>
+                            <input type="number" id="monthlyFee" th:field="*{monthlyFee}" class="form-control" required step="0.01" min="0" placeholder="99.99">
+                            <p class="form-hint">Set the monthly subscription fee</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Program
+                        </button>
+                        <a th:href="@{/admin/programs}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+                
+                <div th:unless="${program != null}" class="error-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Error: Program object not found. Please contact administrator.</p>
+                    <a th:href="@{/admin/programs}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Programs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="admin/footer :: footer"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
