@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.secj3303.dao.BmiRecordDao;
+import com.secj3303.dao.EnrollmentDao;
 import com.secj3303.dao.PersonDao;
 import com.secj3303.dao.ProgramDao; 
 import com.secj3303.dao.TrainerDao;
@@ -25,8 +26,6 @@ import com.secj3303.model.Enrollment;
 import com.secj3303.model.Person;
 import com.secj3303.model.PlanAssignment; 
 import com.secj3303.model.Program;
-import com.secj3303.model.FitnessPlan;
-import com.secj3303.dao.EnrollmentDao;
  
 
 
@@ -49,7 +48,7 @@ public class MemberController {
     @Autowired
     private EnrollmentDao enrollmentDao;
 
-    // Helper method for manual role check
+
     private boolean checkRole(HttpSession session, String expectedRole) {
         if (session == null || expectedRole == null) {
             return false;
@@ -176,6 +175,7 @@ public class MemberController {
 
     @GetMapping("/programs")
     public String browsePrograms(HttpSession session, Model model) {
+
         if (!checkRole(session, "member")) {
             return "redirect:/auth/login";
         }
