@@ -1,117 +1,156 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Assign Plan - HealthHub@UTM</title>
+    <title>Assign Fitness Plan - HealthHub@UTM</title>
     <div th:replace="trainer/header :: header-css"></div>
-    
-    <script th:inline="javascript">
-        // JavaScript to reload the page when a member is selected
-        function onMemberSelect(selectElement) {
-            var memberId = selectElement.value;
-            if (memberId) {
-                // This reloads the current page with the member ID as a query parameter
-                // We use Thymeleaf syntax to ensure the Context Path is included automatically
-                var url = /*[[@{/trainer/plans/assign}]]*/ '/trainer/plans/assign';
-                window.location.href = url + '?selectedMemberId=' + memberId;
-            }
-        }
-    </script>
 </head>
-<body>
+<body class="bg-light">
     <div th:replace="trainer/header :: header-nav"></div>
 
     <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card shadow border-0 rounded-4">
-                    <div class="card-body p-5">
-                        <div class="text-center mb-4">
-                            <i class="fas fa-user-check fa-3x text-success mb-3"></i>
-                            <h2 class="fw-bold">Assign Plan to Member</h2>
-                            <p class="text-muted">Select a member to check their BMI history and assign a routine.</p>
-                        </div>
-                        
-                        <form th:action="@{/trainer/plans/assign/save}" th:object="${assignment}" method="post">
-                            
-                            <!-- 1. Select Member -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Select Member</label>
-                                <!-- Added onchange event to trigger reload -->
-                                <select name="memberId" class="form-select" onchange="onMemberSelect(this)" required>
-                                    <option value="" disabled th:selected="${selectedMemberId == null}">-- Choose a Member --</option>
+        
+        <!-- Unified Main Container -->
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-5">
+                
+                <!-- 1. Member Selection Section -->
+                <div class="mb-4">
+                    <h4 class="mb-3 fw-bold text-primary">Select Member</h4>
+                    <form action="#" th:action="@{/trainer/plans/assign}" method="get">
+                        <div class="row align-items-center">
+                            <div class="col-md-8 col-lg-6">
+                                <select class="form-select form-select-lg" name="selectedMemberId" onchange="this.form.submit()">
+                                    <option value="" disabled th:selected="${selectedMemberId == null}">-- Choose a member --</option>
+                                    <!-- ID removed from display text as requested -->
                                     <option th:each="m : ${members}" 
                                             th:value="${m.personId}" 
-                                            th:text="${m.fullName + ' (' + m.username + ')'}"
-                                            th:selected="${selectedMemberId != null and m.personId == selectedMemberId}">
+                                            th:text="${m.fullName}"
+                                            th:selected="${selectedMemberId != null and selectedMemberId == m.personId}">
+                                        Member Name
                                     </option>
                                 </select>
                             </div>
+                            <div class="col-md-4">
+                                <span class="text-muted small">Select to load details</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
-                            <!-- 2. BMI History Table (Conditional Display) -->
-                            <div th:if="${selectedMemberId != null}" class="mb-4">
-                                <div class="p-3 bg-light rounded-3 border">
-                                    <h5 class="fw-bold text-primary mb-3">
-                                        <i class="fas fa-chart-bar me-2"></i>Member's BMI History
-                                    </h5>
-                                    
-                                    <!-- If history is empty -->
-                                    <div th:if="${#lists.isEmpty(bmiHistory)}" class="text-center text-muted py-2">
-                                        <small>No recorded BMI data for this member.</small>
-                                    </div>
+                <!-- 2. Main Content Area (Only show if member is selected) -->
+                <div th:if="${selectedMemberId != null}">
+                    
+                    <hr class="my-5 text-muted opacity-25">
 
-                                    <!-- If history exists -->
-                                    <div th:unless="${#lists.isEmpty(bmiHistory)}" class="table-responsive" style="max-height: 200px; overflow-y: auto;">
-                                        <table class="table table-sm table-striped bg-white">
-                                            <thead class="table-dark sticky-top">
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <th>Height (cm)</th>
-                                                    <th>Weight (kg)</th>
-                                                    <th>BMI</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr th:each="rec : ${bmiHistory}">
-                                                    <td th:text="${#temporals.format(rec.recordDate, 'dd-MM-yyyy')}"></td>
-                                                    <td th:text="${rec.heightCm}"></td>
-                                                    <td th:text="${rec.weightKg}"></td>
-                                                    <td class="fw-bold" th:text="${rec.bmiValue}"></td>
-                                                    <td>
-                                                        <span class="badge rounded-pill"
-                                                              th:classappend="${rec.bmiValue < 18.5 ? 'bg-warning text-dark' : (rec.bmiValue < 25 ? 'bg-success' : 'bg-danger')}"
-                                                              th:text="${rec.bmiValue < 18.5 ? 'Underweight' : (rec.bmiValue < 25 ? 'Normal' : 'Overweight')}">
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                    <div class="row g-5">
+                        <!-- LEFT COLUMN: Assignment Form -->
+                        <div class="col-lg-5">
+                            <h4 class="mb-4 fw-bold text-primary">Assign New Plan</h4>
+                            
+                            <form th:action="@{/trainer/plans/assign/save}" th:object="${assignment}" method="post">
+                                <input type="hidden" name="memberId" th:value="${selectedMemberId}">
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Select Fitness Plan Template</label>
+                                    <select name="planId" class="form-select" required>
+                                        <option value="" disabled selected>-- Select Plan --</option>
+                                        <option th:each="p : ${plans}" 
+                                                th:value="${p.planId}" 
+                                                th:text="${p.planName + ' (' + p.difficultyLevel + ')'}">
+                                            Plan Name
+                                        </option>
+                                    </select>
+                                    <div class="form-text mt-2">
+                                        Choose a routine that fits the member's goals and enrolled program.
                                     </div>
+                                </div>
+                                
+                                <div class="d-grid mt-5">
+                                    <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+                                        Confirm Assignment
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- RIGHT COLUMN: Member Stats & Enrollment Info -->
+                        <!-- Added border-start-lg for visual separation on large screens -->
+                        <div class="col-lg-7 border-start-lg ps-lg-5">
+                            
+                            <!-- Enrollment Info -->
+                            <div class="mb-5">
+                                <h5 class="mb-4 fw-bold text-secondary">Active Program Enrollments</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Program</th>
+                                                <th>Duration</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:if="${#lists.isEmpty(enrollments)}">
+                                                <td colspan="4" class="text-center py-3 text-muted">
+                                                    <em>Member is not enrolled in any programs yet.</em>
+                                                </td>
+                                            </tr>
+                                            <tr th:each="enroll : ${enrollments}">
+                                                <td class="fw-bold text-dark" th:text="${enroll.program.name}"></td>
+                                                <td th:text="${enroll.program.durationWeeks + ' Weeks'}"></td>
+                                                <td th:text="${enroll.enrollDate}"></td>
+                                                <td>
+                                                    <span class="badge rounded-pill" 
+                                                          th:classappend="${enroll.status == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}"
+                                                          th:text="${enroll.status}">
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
 
-                            <!-- 3. Select Fitness Plan -->
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Select Fitness Plan</label>
-                                <select name="planId" class="form-select" required>
-                                    <option value="" disabled selected>-- Choose a Plan --</option>
-                                    <option th:each="p : ${plans}" 
-                                            th:value="${p.planId}" 
-                                            th:text="${p.planName + ' (' + p.difficultyLevel + ')'}"></option>
-                                </select>
-                                <div class="form-text">Review the BMI history above to choose the most suitable plan.</div>
+                            <!-- BMI History -->
+                            <div>
+                                <h5 class="mb-4 fw-bold text-secondary">Recent BMI History</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Weight</th>
+                                                <th>Height</th>
+                                                <th>BMI</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:if="${#lists.isEmpty(bmiHistory)}">
+                                                <td colspan="4" class="text-center py-3 text-muted">No BMI records found.</td>
+                                            </tr>
+                                            <tr th:each="record : ${bmiHistory}">
+                                                <td th:text="${#temporals.format(record.recordDate, 'dd-MM-yyyy')}"></td>
+                                                <td th:text="${record.weightKg + ' kg'}"></td>
+                                                <td th:text="${record.heightCm + ' cm'}"></td>
+                                                <td>
+                                                    <span class="badge rounded-pill" 
+                                                          th:classappend="${record.bmiValue < 18.5 ? 'bg-warning' : (record.bmiValue < 25 ? 'bg-success' : 'bg-danger')}"
+                                                          th:text="${record.bmiValue}">
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-success btn-lg rounded-pill">
-                                    Confirm Assignment
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        
     </div>
 </body>
 </html>
